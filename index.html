@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Enhancer — RWA Vault v1 Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#09090b; --bg2:#0c0c0f; --sur:#111115;
+  --bdr:rgba(255,255,255,.06); --bdr2:rgba(255,255,255,.1);
+  --text:#fafafa; --muted:#71717a; --dim:#3f3f46; --dimmer:#27272a;
+  --green:#22c55e; --yellow:#eab308; --orange:#f97316; --red:#ef4444;
+  --blue:#818cf8; --sky:#38bdf8; --purple:#a855f7;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--bg);color:var(--text);font-family:var(--mono);font-weight:300;min-height:100vh;font-size:13px}
+.sb{position:fixed;left:0;top:0;bottom:0;width:210px;background:var(--bg);border-right:1px solid var(--bdr);display:flex;flex-direction:column;z-index:200}
+.sb-logo{padding:18px 16px 14px;border-bottom:1px solid var(--bdr)}
+.logo-mark{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--text);letter-spacing:.04em}
+.logo-sub{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.16em;text-transform:uppercase;margin-top:3px}
+.logo-vault{display:flex;align-items:center;gap:7px;margin-top:10px;padding:7px 9px;background:rgba(234,179,8,.06);border:1px solid rgba(234,179,8,.18);border-radius:3px}
+.vault-id{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--yellow)}
+.vault-grade{font-family:var(--mono);font-size:9px;color:var(--yellow);margin-left:auto}
+.sb-nav{flex:1;overflow-y:auto;padding:8px 0}
+.sb-sec-lbl{font-family:var(--mono);font-size:9px;color:var(--dimmer);letter-spacing:.2em;text-transform:uppercase;padding:12px 14px 4px}
+.ni{display:flex;align-items:center;gap:7px;padding:6px 10px;margin:1px 6px;border-radius:3px;cursor:pointer;font-family:var(--mono);font-size:11.5px;font-weight:300;color:var(--muted);transition:all .1s;user-select:none;position:relative}
+.ni:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.ni.active{background:rgba(255,255,255,.06);color:var(--text)}
+.ni.active::before{content:'';position:absolute;left:0;top:4px;bottom:4px;width:1.5px;background:var(--text);border-radius:1px}
+.ni-icon{width:13px;text-align:center;font-size:11px;opacity:.4;flex-shrink:0}
+.ni-badge{margin-left:auto;font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:10px}
+.nb-y{color:var(--yellow);background:rgba(234,179,8,.12)}
+.nb-g{color:var(--green);background:rgba(34,197,94,.12)}
+.sb-foot{padding:12px 14px;border-top:1px solid var(--bdr)}
+.main{margin-left:210px;min-height:100vh}
+.topbar{height:44px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg);position:sticky;top:0;z-index:100}
+.tp-title{font-family:var(--mono);font-size:13px;font-weight:400;color:var(--text)}
+.tp-tag{font-family:var(--mono);font-size:9px;color:var(--dim);padding:2px 7px;background:rgba(255,255,255,.04);border:1px solid var(--bdr);border-radius:2px;letter-spacing:.08em}
+.tp-r{margin-left:auto;display:flex;align-items:center;gap:12px}
+.btn{padding:4px 10px;border:1px solid var(--bdr);border-radius:2px;background:transparent;color:var(--muted);font-family:var(--mono);font-size:10px;cursor:pointer;letter-spacing:.06em;transition:all .1s}
+.btn:hover{border-color:var(--bdr2);color:var(--text);background:rgba(255,255,255,.04)}
+.page{display:none;padding:18px 20px;animation:fadeIn .2s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+</style>
+</head>
+<body>
+<aside class="sb">
+  <div class="sb-logo">
+    <div class="logo-mark">Enhancer</div>
+    <div class="logo-sub">RWA Risk OS · Undefined Labs</div>
+    <div class="logo-vault">
+      <span style="width:5px;height:5px;border-radius:50%;background:#22c55e;animation:pulse 2s ease-in-out infinite;flex-shrink:0"></span>
+      <span class="vault-id">Vault v1</span>
+      <span class="vault-grade">B+ / 3.12</span>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec-lbl">Vault v1</div>
+    <div class="ni active" onclick="nav('overview',this)"><span class="ni-icon">◈</span>Overview</div>
+    <div class="ni" onclick="nav('allocation',this)"><span class="ni-icon">◑</span>Asset Allocation</div>
+    <div class="ni" onclick="nav('risk',this)"><span class="ni-icon">⊞</span>UDL Risk Score<span class="ni-badge nb-y">B+</span></div>
+    <div class="ni" onclick="nav('ltv',this)"><span class="ni-icon">≋</span>LTV & Leverage</div>
+    <div class="ni" onclick="nav('stress',this)"><span class="ni-icon">⚡</span>Stress Scenarios<span class="ni-badge nb-y">6</span></div>
+    <div class="ni" onclick="nav('reserve',this)"><span class="ni-icon">◉</span>Protocol Reserve</div>
+    <div class="ni" onclick="nav('monitoring',this)"><span class="ni-icon">△</span>Monitoring<span class="ni-badge nb-g">✓</span></div>
+    <div class="sb-sec-lbl">System</div>
+    <div class="ni" onclick="nav('vaults',this)"><span class="ni-icon">◇</span>Vault Registry<span class="ni-badge nb-g">1</span></div>
+  </nav>
+  <div class="sb-foot">
+    <div style="display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--dim)">
+      <span style="width:5px;height:5px;border-radius:50%;background:#22c55e;box-shadow:0 0 4px #22c55e;display:inline-block;animation:pulse 2s ease-in-out infinite"></span>all systems normal
+    </div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--dimmer);margin-top:3px">UDL Framework v0.1 · Mar 2026</div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div class="tp-title" id="page-title">Vault Overview</div>
+    <div class="tp-tag" id="page-tag">Enhancer RWA Vault v1</div>
+    <div class="tp-r">
+      <span id="clock" style="font-family:var(--mono);font-size:10px;color:var(--dim)"></span>
+      <button class="btn" onclick="location.reload()">↺</button>
+    </div>
+  </header>
+
+  <!-- OVERVIEW -->
+  <div class="page active" id="page-overview">
+    <div id="kpi-overview"></div>
+    <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;margin-bottom:16px">
+      <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;padding:14px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div style="font-family:var(--mono);font-size:9px;color:#3f3f46;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px;text-align:center">Allocation</div>
+        <canvas id="ch-alloc" style="max-width:180px;max-height:180px"></canvas>
+      </div>
+      <div id="asset-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+        <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="font-family:var(--mono);font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase">Yield Waterfall</span></div>
+        <div style="padding:14px"><canvas id="ch-yield" style="height:150px;width:100%"></canvas></div>
+      </div>
+      <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+        <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="font-family:var(--mono);font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase">LTV Trend — 7d</span></div>
+        <div style="padding:14px"><canvas id="ch-ltv-hist" style="height:150px;width:100%"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALLOCATION -->
+  <div class="page" id="page-allocation">
+    <div id="alloc-detail"></div>
+  </div>
+
+  <!-- RISK SCORE -->
+  <div class="page" id="page-risk">
+    <div id="risk-score-display"></div>
+    <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px">
+      <div id="risk-asset-layers"></div>
+      <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+        <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="font-family:var(--mono);font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase">Layer Radar</span></div>
+        <div style="padding:14px"><canvas id="ch-radar" style="height:240px;width:100%"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LTV -->
+  <div class="page" id="page-ltv">
+    <div id="ltv-content"></div>
+    <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-top:16px">
+      <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="font-family:var(--mono);font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase">LTV Chart — 7d</span></div>
+      <div style="padding:14px"><canvas id="ch-ltv" style="height:150px;width:100%"></canvas></div>
+    </div>
+    <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;padding:16px;margin-top:16px" id="ltv-leverage"></div>
+  </div>
+
+  <!-- STRESS -->
+  <div class="page" id="page-stress">
+    <div id="stress-content"></div>
+  </div>
+
+  <!-- RESERVE -->
+  <div class="page" id="page-reserve">
+    <div id="reserve-content"></div>
+  </div>
+
+  <!-- MONITORING -->
+  <div class="page" id="page-monitoring">
+    <div id="monitoring-content"></div>
+  </div>
+
+  <!-- VAULTS -->
+  <div class="page" id="page-vaults">
+    <div id="vaults-content"></div>
+  </div>
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════
+// ENHANCER RWA VAULT v1 — LIVE DATA
+// iSNR 55% / PDO 30% / uMINT 15% | LTV 55% | 1.5x
+// Source: UDL Risk Framework v0.1 (March 2026)
+// ═══════════════════════════════════════════════════
+
+const VAULT = {
+  name: "Enhancer RWA Vault v1",
+  version: "v1",
+  curator: "Undefined Labs",
+  provider: "DigiFT",
+  status: "live",
+  
+  // Allocation
+  allocation: [
+    { id: "iSNR", name: "iSNR", fullName: "Invesco iShares TIPS ETF", weight: 0.55, color: "#818cf8" },
+    { id: "PDO",  name: "PDO",  fullName: "PIMCO Dynamic Bond",       weight: 0.30, color: "#38bdf8" },
+    { id: "uMINT",name: "uMINT",fullName: "uMINT (UBS USD MMF)",      weight: 0.15, color: "#22c55e" },
+  ],
+
+  // LTV / Leverage
+  operating_ltv: 0.55,
+  ceiling_ltv: 0.621,
+  leverage: 1.5,
+  ltv_buffer: 0.071,  // 7.1%
+
+  // Reserve
+  reserve_ratio: 0.10,
+  reserve_cap_freeze: 0.08,
+  reserve_emergency: 0.06,
+
+  // Phase 1
+  vault_cap: 5_000_000,
+  reserve_amount: 500_000,
+  senior_depositors: 4_500_000,
+
+  // Yield
+  gross_blended: 0.0894,
+  digift_fee: 0.0040,
+  net_blended: 0.0854,
+  defi_enhancement: 0.025,
+  curator_fee_range: [0.01, 0.02],
+  target_net_yield: [0.09, 0.10],
+
+  // Per-asset yield
+  assets: {
+    iSNR: { base_yield: 0.090, net_yield: 0.086, max_ltv: 0.55, udl_score: 3.30, grade: "B+",
+             aum: "~$30B", manager: "Invesco/BlackRock iShares", type: "U.S. TIPS ETF",
+             vol: 0.025, max_drawdown: -0.123, duration: 0.30,
+             layers: { L1:3.5, L2:2.5, L3:3.0, L4:3.5, L5:3.5, L6:3.5 } },
+    PDO:  { base_yield: 0.1181, net_yield: 0.1141, max_ltv: 0.60, udl_score: 3.35, grade: "B+",
+             aum: "~$2B", manager: "PIMCO", type: "Dynamic Bond CEF",
+             vol: 0.102, max_drawdown: -0.314, duration: 5.5,
+             layers: { L1:3.5, L2:2.5, L3:3.5, L4:3.5, L5:3.5, L6:3.0 } },
+    uMINT:{ base_yield: 0.0295, net_yield: 0.0255, max_ltv: 0.92, udl_score: 2.00, grade: "A-",
+             aum: "N/A", manager: "UBS/DigiFT", type: "Yield-bearing USD MMF",
+             vol: 0.001, max_drawdown: -0.005, duration: 0,
+             layers: { L1:3.0, L2:2.0, L3:2.0, L4:2.0, L5:1.5, L6:2.0 } },
+  },
+
+  // Portfolio composite
+  portfolio_score: 3.12,
+  portfolio_grade: "B+",
+  portfolio_grade_label: "Moderate",
+
+  // Portfolio layer scores (weighted)
+  portfolio_layers: {
+    L1: { score: 3.43, weight: 0.15, contrib: 0.514, name: "Technical / Operational" },
+    L2: { score: 2.43, weight: 0.10, contrib: 0.243, name: "Oracle / Valuation" },
+    L3: { score: 3.00, weight: 0.20, contrib: 0.600, name: "Market / Liquidation" },
+    L4: { score: 3.28, weight: 0.15, contrib: 0.491, name: "Concentration / Correlation" },
+    L5: { score: 3.20, weight: 0.30, contrib: 0.960, name: "Credit / ECL" },
+    L6: { score: 3.13, weight: 0.10, contrib: 0.313, name: "Compliance / Regulatory" },
+  },
+
+  // Stress scenarios
+  stress: [
+    { id:1, name:"Rate Spike +200bps",    trigger:"U.S. Fed emergency hike",
+      nav_impact:-0.059, ltv_post:0.584, ltv_buffer_post:0.037, breach:false, reserve:"standby",
+      assets_impact: {iSNR:-0.08, PDO:-0.05}, severity:"medium" },
+    { id:2, name:"Credit Spread +300bps", trigger:"HY spread widening",
+      nav_impact:-0.036, ltv_post:0.571, ltv_buffer_post:0.050, breach:false, reserve:"amber watch",
+      assets_impact: {iSNR:0, PDO:-0.12}, severity:"medium" },
+    { id:3, name:"Correlated Drawdown",   trigger:"Global risk-off (2008-style)",
+      nav_impact:-0.127, ltv_post:0.630, ltv_buffer_post:-0.009, breach:true, reserve:"FULL DEPLOY",
+      assets_impact: {iSNR:-0.15, PDO:-0.20}, severity:"high" },
+    { id:4, name:"uMINT Depeg -10%",      trigger:"Stablecoin reserve failure",
+      nav_impact:-0.015, ltv_post:0.558, ltv_buffer_post:0.063, breach:false, reserve:"rebalance",
+      assets_impact: {uMINT:-0.10}, severity:"low" },
+    { id:5, name:"PDO Redemption Freeze", trigger:"HY market stress, T+5+ delay",
+      nav_impact:0, ltv_post:0.550, ltv_buffer_post:0.071, breach:false, reserve:"covers gap",
+      assets_impact: {PDO:"freeze"}, severity:"medium" },
+    { id:6, name:"DeFi Protocol Exploit", trigger:"Smart contract vulnerability",
+      nav_impact:-1.0, ltv_post:null, ltv_buffer_post:null, breach:true, reserve:"insufficient",
+      assets_impact: {}, severity:"tail" },
+  ],
+
+  // Monitoring triggers
+  monitoring: [
+    { metric:"Portfolio LTV",    cadence:"Daily",   green:"<45%",    amber:"45-55%", red:">55%",   action:"Begin deleverage" },
+    { metric:"Reserve Ratio",    cadence:"Daily",   green:">12%",    amber:"8-12%",  red:"<8%",    action:"Halt expansion; top-up reserve" },
+    { metric:"iSNR NAV Drawdown",cadence:"Daily",   green:"<3%",     amber:"3-7%",   red:">7%",    action:"Reduce iSNR; add collateral" },
+    { metric:"PDO Redemption Q", cadence:"Event",   green:"T+2",     amber:"T+3-4",  red:">T+5",   action:"Pause new PDO deposits" },
+    { metric:"Protocol TVL Δ",   cadence:"Weekly",  green:"<10%/mo", amber:"10-25%", red:">25%",   action:"Protocol risk review" },
+    { metric:"uMINT Depeg",      cadence:"Daily",   green:"<0.5%",   amber:"0.5-2%", red:">2%",    action:"Exit uMINT to USDC" },
+    { metric:"Oracle Heartbeat", cadence:"Auto",    green:"<1h lag", amber:"1-4h",   red:">4h",    action:"Circuit breaker activation" },
+    { metric:"Reserve/Cap",      cadence:"Monthly", green:">10%",    amber:"8-10%",  red:"<8%",    action:"Emergency reserve top-up" },
+  ],
+
+  // Capital stack
+  capital_stack: [
+    { layer:"Protocol Reserve (10%)", priority:"1st Loss", amount: 500_000, source:"Protocol capital — USDC", color:"#ef4444" },
+    { layer:"Senior Depositors (90%)", priority:"Senior",  amount:4_500_000, source:"Earn ~9-10% APY (net)", color:"#22c55e" },
+  ],
+
+  // Historical performance (simulated 42 data points, 7d)
+  history: (() => {
+    const now = Date.now();
+    const pts = 42;
+    return Array.from({length:pts}, (_,i) => ({
+      t: new Date(now - (pts-1-i)*4*3600*1000).toISOString().slice(0,16),
+      ltv: 0.52 + Math.sin(i/8)*0.02 + (Math.random()-0.5)*0.005,
+      reserve: 0.102 + Math.sin(i/12)*0.005 + (Math.random()-0.5)*0.002,
+      isnr_nav: 1.000 + (Math.random()-0.5)*0.006,
+      pdo_nav:  1.000 + (Math.random()-0.52)*0.012,
+      umint_nav: 1.000 + (Math.random()-0.5)*0.001,
+    }));
+  })(),
+};
+
+// Multi-vault registry (future vaults go here)
+const VAULTS_REGISTRY = [
+  { id:"v1", name:"Enhancer RWA Vault v1", status:"live", grade:"B+", score:3.12, tvl:4_500_000 },
+  // future vaults
+];
+
+
+// ═══════════════════════════════════════════════════
+// DESIGN CONSTANTS
+// ═══════════════════════════════════════════════════
+const MN = "IBM Plex Mono,ui-monospace,Menlo,Consolas,monospace";
+const SANS = "'IBM Plex Sans',system-ui,sans-serif";
+
+const GRADE_C = { "A":"#22c55e","A-":"#4ade80","B+":"#eab308","B":"#f97316","B-":"#fb923c","C":"#ef4444" };
+const SEV_C = { high:"#ef4444", medium:"#eab308", low:"#22c55e", tail:"#a855f7" };
+const LAYER_C = { L1:"#818cf8",L2:"#38bdf8",L3:"#f97316",L4:"#eab308",L5:"#ef4444",L6:"#a855f7" };
+const ASSET_C = { iSNR:"#818cf8", PDO:"#38bdf8", uMINT:"#22c55e" };
+
+function $M(v){if(v>=1e6)return`$${(v/1e6).toFixed(2)}M`;if(v>=1e3)return`$${(v/1e3).toFixed(0)}K`;return`$${v.toFixed(0)}`;}
+function pct(v,d=1){return`${(v*100).toFixed(d)}%`;}
+function pctRaw(v,d=1){return`${v.toFixed(d)}%`;}
+function sc(s){
+  // Score 1-5, lower is better
+  if(s<=1.5)return"#22c55e";if(s<=2.5)return"#86efac";
+  if(s<=3.0)return"#eab308";if(s<=3.5)return"#f97316";return"#ef4444";
+}
+function ltvColor(v){
+  if(v<0.45)return"#22c55e";if(v<0.55)return"#eab308";return"#ef4444";
+}
+
+function row(label,val,vc){
+  return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+    <span style="font-family:${MN};font-size:11px;color:#71717a">${label}</span>
+    <span style="font-family:${MN};font-size:11px;color:${vc||"#e4e4e7"}">${val}</span>
+  </div>`;
+}
+function kv(label,val,color,sub){
+  return `<div style="padding:18px 20px;border-right:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06)">
+    <div style="font-family:${MN};font-size:9px;color:#52525b;letter-spacing:.14em;text-transform:uppercase;margin-bottom:9px">${label}</div>
+    <div style="font-family:${MN};font-size:20px;font-weight:500;color:${color||"#fafafa"};letter-spacing:-.02em;line-height:1">${val}</div>
+    ${sub?`<div style="font-family:${MN};font-size:10px;color:#3f3f46;margin-top:5px">${sub}</div>`:""}
+  </div>`;
+}
+function mbar(val,color,max=100){
+  return `<div style="height:2px;background:rgba(255,255,255,.06);border-radius:1px;overflow:hidden">
+    <div style="height:100%;width:${Math.min((val/max)*100,100)}%;background:${color}"></div>
+  </div>`;
+}
+function thdr(headers){
+  return `<tr>${headers.map(h=>`<th style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.12em;text-transform:uppercase;padding:0 12px 10px;text-align:left;font-weight:400;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.06)">${h}</th>`).join("")}</tr>`;
+}
+function badge(text,color){
+  return `<span style="font-family:${MN};font-size:9px;padding:2px 7px;border-radius:2px;color:${color};background:${color}14;border:1px solid ${color}28;white-space:nowrap">${text}</span>`;
+}
+function gradebadge(g){
+  const c=GRADE_C[g]||"#52525b";
+  return badge(g,c);
+}
+function scorebar(s,w=80){
+  // score 1-5, bar fills proportionally
+  const fill=(s/5)*100;
+  const c=sc(s);
+  return `<div style="display:flex;align-items:center;gap:8px">
+    <div style="width:${w}px;height:2px;background:rgba(255,255,255,.06);border-radius:1px;overflow:hidden">
+      <div style="height:100%;width:${fill}%;background:${c}"></div>
+    </div>
+    <span style="font-family:${MN};font-size:11px;color:${c};min-width:30px">${s.toFixed(2)}</span>
+  </div>`;
+}
+function ltvmeter(current,ceiling,operating){
+  const cur_pct=(current/ceiling)*100;
+  const op_pct=(operating/ceiling)*100;
+  const color=ltvColor(current);
+  return `<div style="position:relative;height:8px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden">
+    <div style="height:100%;width:${cur_pct}%;background:${color};border-radius:2px;transition:width .4s"></div>
+    <div style="position:absolute;top:0;bottom:0;left:${op_pct}%;width:1px;background:rgba(255,255,255,.3)"></div>
+  </div>`;
+}
+function statusdot(status){
+  const c = {live:"#22c55e",amber:"#eab308",red:"#ef4444",freeze:"#f97316"}[status]||"#52525b";
+  const anim = status==="live" ? "animation:pulse 2s ease-in-out infinite" : "";
+  return `<span style="width:6px;height:6px;border-radius:50%;background:${c};box-shadow:0 0 4px ${c};display:inline-block;${anim}"></span>`;
+}
+
+// ═══════════════════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════════════════
+const CH = {};
+function dc(id){if(CH[id]){CH[id].destroy();delete CH[id];}}
+
+const CD = {
+  responsive:true, maintainAspectRatio:false, animation:{duration:400},
+  plugins:{
+    legend:{display:false},
+    tooltip:{backgroundColor:"#18181b",borderColor:"rgba(255,255,255,.08)",borderWidth:1,
+      padding:10,titleFont:{family:MN,size:10},bodyFont:{family:MN,size:10},
+      titleColor:"#a1a1aa",bodyColor:"#fafafa"},
+  },
+  scales:{
+    x:{grid:{color:"rgba(255,255,255,.04)"},ticks:{color:"#3f3f46",font:{family:MN,size:9}},border:{display:false}},
+    y:{grid:{color:"rgba(255,255,255,.04)"},ticks:{color:"#3f3f46",font:{family:MN,size:9}},border:{display:false}},
+  },
+};
+
+// ═══════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════
+const PAGE_META = {
+  overview:   ["Vault Overview",    "Enhancer RWA Vault v1"],
+  allocation: ["Asset Allocation",  "iSNR 55% / PDO 30% / uMINT 15%"],
+  risk:       ["UDL Risk Score",    "6-Layer Framework v0.1"],
+  ltv:        ["LTV & Leverage",    "1.5x · Operating 55% · Ceiling 62.1%"],
+  stress:     ["Stress Scenarios",  "6 scenarios · UDL Framework"],
+  reserve:    ["Protocol Reserve",  "10% First-Loss Tranche"],
+  monitoring: ["Monitoring",        "Always-On Triggers"],
+  vaults:     ["Vault Registry",    "Multi-vault · Phase roadmap"],
+};
+const RENDERS = {};
+let currentPage = "overview";
+
+function nav(id, el){
+  currentPage = id;
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".ni").forEach(n=>n.classList.remove("active"));
+  const pg = document.getElementById("page-"+id);
+  if(pg) pg.classList.add("active");
+  if(el) el.classList.add("active");
+  const [t,g] = PAGE_META[id]||[id,""];
+  document.getElementById("page-title").textContent = t;
+  document.getElementById("page-tag").textContent = g;
+  if(RENDERS[id]) RENDERS[id]();
+}
+
+function updateClock(){
+  const kst = new Date(Date.now()+9*3600*1000);
+  const el = document.getElementById("clock");
+  if(el) el.textContent = kst.toISOString().replace("T"," ").slice(0,16)+" KST";
+}
+setInterval(updateClock,1000); updateClock();
+
+// ═══════════════════════════════════════════════════
+// PAGE 1: VAULT OVERVIEW
+// ═══════════════════════════════════════════════════
+RENDERS.overview = function(){
+  try{
+    const A = VAULT.assets;
+    const totalNav = VAULT.senior_depositors;
+    const curLtv = VAULT.history[VAULT.history.length-1]?.ltv || 0.523;
+    const curReserve = VAULT.history[VAULT.history.length-1]?.reserve || 0.102;
+    
+    // KPI strip
+    const kpiel = document.getElementById("kpi-overview");
+    if(kpiel) kpiel.innerHTML = `<div style="display:grid;grid-template-columns:repeat(6,1fr);border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:20px">
+      ${kv("Vault Grade","B+","#eab308","3.12 / 5.0 · Moderate")}
+      ${kv("Target Yield","9–10%","#22c55e","net post-DigiFT fee")}
+      ${kv("Current LTV",pct(curLtv)+"",ltvColor(curLtv),`ceiling ${pct(VAULT.ceiling_ltv)} · ${pct(VAULT.ltv_buffer)} buffer`)}
+      ${kv("Protocol Reserve",pct(curReserve),"#22c55e","10% cap · first-loss")}
+      ${kv("Vault Cap (Ph.1)",$M(VAULT.vault_cap),"#fafafa","Phase 2: $50M")}
+      ${kv("Leverage","1.5×","#fafafa","operating LTV 55%")}
+    </div>`;
+
+    // Allocation donut
+    dc("ch-alloc");
+    const aEl = document.getElementById("ch-alloc");
+    if(aEl){
+      const ctx = aEl.getContext("2d");
+      const data = VAULT.allocation;
+      CH["ch-alloc"] = new Chart(ctx,{
+        type:"doughnut",
+        data:{
+          labels: data.map(d=>d.id),
+          datasets:[{data:data.map(d=>d.weight*100),
+            backgroundColor:data.map(d=>d.color+"44"),
+            borderColor:data.map(d=>d.color),borderWidth:1.5,hoverOffset:4}]
+        },
+        options:{...CD,cutout:"68%",
+          plugins:{...CD.plugins,
+            legend:{display:true,position:"right",labels:{color:"#71717a",font:{family:MN,size:10},boxWidth:10,padding:8}},
+            tooltip:{...CD.plugins.tooltip,callbacks:{label:(c)=>`${c.label}: ${c.raw}%`}}}}
+      });
+    }
+
+    // Per-asset summary
+    const assetEl = document.getElementById("asset-summary");
+    if(assetEl) assetEl.innerHTML = VAULT.allocation.map(a=>{
+      const info = VAULT.assets[a.id];
+      return `<div style="padding:14px;border:1px solid rgba(255,255,255,.06);border-radius:3px;border-left:2px solid ${a.color}">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+          <div>
+            <span style="font-family:${MN};font-size:13px;font-weight:500;color:#fafafa">${a.id}</span>
+            <span style="font-family:${MN};font-size:10px;color:#52525b;margin-left:7px">${a.weight*100}%</span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            ${gradebadge(info.grade)}
+            <span style="font-family:${MN};font-size:10px;color:${sc(info.udl_score)}">${info.udl_score.toFixed(2)}/5</span>
+          </div>
+        </div>
+        <div style="font-family:${SANS};font-size:11px;color:#71717a;margin-bottom:10px">${info.fullName||a.fullName}</div>
+        ${row("Base Yield",`${(info.base_yield*100).toFixed(2)}%`,"#22c55e")}
+        ${row("Net Yield (post-DigiFT)",`${(info.net_yield*100).toFixed(2)}%`,"#22c55e")}
+        ${row("Max LTV",pct(info.max_ltv))}
+        ${row("Ann. Volatility",`${(info.vol*100).toFixed(1)}%`,info.vol>0.05?"#f97316":"#e4e4e7")}
+        ${row("Max Drawdown",`${(info.max_drawdown*100).toFixed(1)}%`,"#f97316")}
+        ${row("Manager",info.manager,"#71717a")}
+      </div>`;
+    }).join("");
+
+    // Yield waterfall chart
+    dc("ch-yield");
+    const yEl = document.getElementById("ch-yield");
+    if(yEl) CH["ch-yield"] = new Chart(yEl.getContext("2d"),{
+      type:"bar",
+      data:{
+        labels:["Gross Blended","− DigiFT Fee","Net Asset","+ DeFi (1.5×)","− Curator Fee","Target Net"],
+        datasets:[{
+          data:[8.94,-0.40,8.54,2.50,-1.50,9.04],
+          backgroundColor:["#818cf840","#ef444440","#818cf840","#22c55e40","#ef444440","#22c55e60"],
+          borderColor:["#818cf8","#ef4444","#818cf8","#22c55e","#ef4444","#22c55e"],
+          borderWidth:1,borderRadius:2
+        }]
+      },
+      options:{...CD,
+        scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>`${v}%`}}},
+        plugins:{...CD.plugins,tooltip:{...CD.plugins.tooltip,callbacks:{label:(c)=>`${c.raw>0?"+":""}${c.raw}%`}}}
+      }
+    });
+
+    // LTV history
+    dc("ch-ltv-hist");
+    const ltvHistEl = document.getElementById("ch-ltv-hist");
+    if(ltvHistEl){
+      const hist = VAULT.history;
+      const ctx = ltvHistEl.getContext("2d");
+      const grad = ctx.createLinearGradient(0,0,0,100);
+      grad.addColorStop(0,"rgba(234,179,8,.18)"); grad.addColorStop(1,"rgba(234,179,8,.0)");
+      CH["ch-ltv-hist"] = new Chart(ctx,{
+        type:"line",
+        data:{
+          labels:hist.map((h,i)=>i%7===0?h.t.slice(5,13):""),
+          datasets:[
+            {data:hist.map(h=>+(h.ltv*100).toFixed(2)),
+              borderColor:"#eab308",backgroundColor:grad,fill:true,borderWidth:1.2,pointRadius:0,tension:0.4,label:"LTV %"},
+            {data:hist.map(()=>62.1),borderColor:"rgba(239,68,68,.5)",borderDash:[3,3],
+              borderWidth:1,pointRadius:0,fill:false,label:"Ceiling 62.1%"},
+            {data:hist.map(()=>55),borderColor:"rgba(255,255,255,.15)",borderDash:[2,4],
+              borderWidth:1,pointRadius:0,fill:false,label:"Operating 55%"},
+          ]
+        },
+        options:{...CD,
+          scales:{...CD.scales,y:{...CD.scales.y,min:40,max:70,ticks:{...CD.scales.y.ticks,callback:v=>`${v}%`}}},
+          plugins:{...CD.plugins,legend:{display:true,labels:{color:"#52525b",font:{family:MN,size:9},boxWidth:12,padding:10}},
+            tooltip:{...CD.plugins.tooltip,callbacks:{label:(c)=>`${c.dataset.label}: ${c.raw}%`}}}
+        }
+      });
+    }
+  }catch(e){console.error("Overview:",e);}
+};
+
+// ═══════════════════════════════════════════════════
+// PAGE 2: ASSET ALLOCATION
+// ═══════════════════════════════════════════════════
+RENDERS.allocation = function(){
+  try{
+    const el = document.getElementById("alloc-detail");
+    if(!el) return;
+
+    // Yield table
+    const rows = [
+      ["Base Asset Yield (gross)", "9.00%",  "11.81%", "2.95%",  "8.94%",  "#fafafa"],
+      ["DigiFT Distribution Fee",  "-0.40%", "-0.40%", "-0.40%", "-0.40%", "#ef4444"],
+      ["Net Asset Yield",           "8.60%",  "11.41%", "2.55%",  "8.54%",  "#22c55e"],
+      ["Allocation Weight",         "55%",    "30%",    "15%",    "100%",   "#71717a"],
+      ["Weighted Contribution",     "4.73%",  "3.42%",  "0.38%",  "8.54%",  "#818cf8"],
+      ["DeFi Enhancement (1.5×)",   "+2.5%",  "+2.5%",  "+2.5%",  "+2.5%",  "#22c55e"],
+    ];
+
+    el.innerHTML = `
+    <div style="margin-bottom:24px">
+      <div style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)">Yield Structure</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11.5px">
+        <thead><tr>
+          ${["Component","iSNR (55%)","PDO (30%)","uMINT (15%)","Blended"].map(h=>`<th style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.12em;text-transform:uppercase;padding:0 12px 10px;text-align:right;font-weight:400;border-bottom:1px solid rgba(255,255,255,.06)">${h}</th>`).join("")}
+        </tr></thead>
+        <tbody>${rows.map(([lbl,...vals])=>`<tr style="border-bottom:1px solid rgba(255,255,255,.03)">
+          <td style="padding:8px 12px;font-family:${MN};font-size:11px;color:#71717a">${lbl}</td>
+          ${vals.slice(0,-1).map(v=>`<td style="padding:8px 12px;font-family:${MN};font-size:11px;color:#e4e4e7;text-align:right">${v}</td>`).join("")}
+          <td style="padding:8px 12px;font-family:${MN};font-size:12px;font-weight:500;color:${vals[vals.length-1]};text-align:right">${vals[vals.length-2]}</td>
+        </tr>`).join("")}
+        <tr style="border-top:1px solid rgba(255,255,255,.1)">
+          <td style="padding:10px 12px;font-family:${MN};font-size:11px;color:#fafafa;font-weight:500">Target Net Yield</td>
+          <td colspan="3" style="padding:10px 12px;font-family:${MN};font-size:11px;color:#52525b;text-align:right">post-DigiFT + DeFi − curator fee</td>
+          <td style="padding:10px 12px;font-family:${MN};font-size:14px;font-weight:500;color:#22c55e;text-align:right">~9–10%</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:20px">
+      ${VAULT.allocation.map(a=>{
+        const info = VAULT.assets[a.id];
+        const maxLtv_w = a.max_ltv || info.max_ltv;
+        const contrib = a.weight * maxLtv_w;
+        return `<div style="background:#09090b;padding:16px 18px">
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:12px">
+            <div style="width:6px;height:6px;border-radius:50%;background:${a.color}"></div>
+            <span style="font-family:${MN};font-size:12px;color:#fafafa;font-weight:500">${a.id}</span>
+            <span style="font-family:${MN};font-size:11px;color:#52525b">${a.weight*100}%</span>
+          </div>
+          <div style="font-family:${SANS};font-size:11px;color:#52525b;margin-bottom:12px">${info.fullName}</div>
+          ${row("Manager", info.manager,"#71717a")}
+          ${row("Type", info.type||"","#71717a")}
+          ${row("Base Yield",`${(info.base_yield*100).toFixed(2)}%`,"#22c55e")}
+          ${row("Max LTV (Protocol)",pct(info.max_ltv),"#e4e4e7")}
+          ${row("Weighted LTV Contrib.",pct(contrib,1),"#818cf8")}
+          ${row("Ann. Vol",`${(info.vol*100).toFixed(1)}%`,info.vol>0.05?"#f97316":"#e4e4e7")}
+          ${row("Max Drawdown",`${(info.max_drawdown*100).toFixed(1)}%`,"#f97316")}
+          <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.04)">
+            <div style="font-family:${MN};font-size:9px;color:#3f3f46;margin-bottom:5px">allocation weight</div>
+            ${mbar(a.weight*100,a.color)}
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
+
+    <div style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px">LTV Ceiling Calculation</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+      ${[["Asset","Allocation","Max LTV","Weighted LTV","Buffer to Ceiling"],
+         ["iSNR","55%","55%","30.25%","0%"],
+         ["PDO","30%","60%","18.00%","5%"],
+         ["uMINT","15%","92%","13.80%","37%"],
+         ["PORTFOLIO","100%","62.1%","62.1%","7.1%"],
+      ].map((row,ri)=>row.map(cell=>`<div style="background:#09090b;padding:${ri===0?"10px 12px":"8px 12px"};font-family:${MN};font-size:${ri===0?"9px":"11px"};color:${ri===0?"#3f3f46":ri===4?"#eab308":"#e4e4e7"};font-weight:${ri===4?"500":"300"};letter-spacing:${ri===0?".12em":"0"};text-transform:${ri===0?"uppercase":"none"};border-bottom:${ri===4?"none":"1px solid rgba(255,255,255,.04)"}">${cell}</div>`).join("")).flat().join("")}
+    </div>`;
+  }catch(e){console.error("Allocation:",e);}
+};
+
+// ═══════════════════════════════════════════════════
+// PAGE 3: UDL RISK SCORE
+// ═══════════════════════════════════════════════════
+RENDERS.risk = function(){
+  try{
+    const pl = VAULT.portfolio_layers;
+    const layers = Object.entries(pl);
+
+    // Portfolio score big display
+    const scoreEl = document.getElementById("risk-score-display");
+    if(scoreEl) scoreEl.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 2fr;gap:20px;border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:20px">
+        <div style="background:#09090b;padding:24px;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+          <div style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.18em;text-transform:uppercase;margin-bottom:12px">Portfolio Composite</div>
+          <div style="font-family:${MN};font-size:52px;font-weight:500;color:#eab308;letter-spacing:-.04em;line-height:1">${VAULT.portfolio_score.toFixed(2)}</div>
+          <div style="font-family:${MN};font-size:11px;color:#52525b;margin-top:4px">/ 5.0</div>
+          <div style="margin-top:14px">${gradebadge(VAULT.portfolio_grade)}</div>
+          <div style="font-family:${MN};font-size:10px;color:#52525b;margin-top:6px">${VAULT.portfolio_grade_label}</div>
+          <div style="font-family:${SANS};font-size:10px;color:#3f3f46;margin-top:4px">UDL Framework v0.1</div>
+        </div>
+        <div style="background:#09090b;padding:20px">
+          <div style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.15em;text-transform:uppercase;margin-bottom:14px">Score Calculation</div>
+          <div style="font-family:${MN};font-size:12px;color:#52525b;margin-bottom:14px;padding:10px;background:rgba(255,255,255,.03);border-radius:2px;border:1px solid rgba(255,255,255,.06)">
+            3.30×0.55 + 3.35×0.30 + 2.00×0.15 = 1.815 + 1.005 + 0.300 = <span style="color:#eab308">3.12 / 5.0</span>
+          </div>
+          ${layers.map(([id,l])=>`
+            <div style="margin-bottom:10px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-family:${MN};font-size:10px;color:${LAYER_C[id]};background:${LAYER_C[id]}18;border:1px solid ${LAYER_C[id]}28;padding:1px 6px;border-radius:2px">${id}</span>
+                  <span style="font-family:${MN};font-size:11px;color:#71717a">${l.name}</span>
+                  <span style="font-family:${MN};font-size:10px;color:#3f3f46">wt.${(l.weight*100).toFixed(0)}%</span>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center">
+                  <span style="font-family:${MN};font-size:10px;color:#52525b">contrib ${l.contrib.toFixed(3)}</span>
+                  <span style="font-family:${MN};font-size:11px;color:${sc(l.score)};min-width:28px;text-align:right">${l.score.toFixed(2)}</span>
+                </div>
+              </div>
+              <div style="height:2px;background:rgba(255,255,255,.06);border-radius:1px;overflow:hidden">
+                <div style="height:100%;width:${(l.score/5)*100}%;background:${LAYER_C[id]}"></div>
+              </div>
+            </div>`).join("")}
+        </div>
+      </div>`;
+
+    // Per-asset layer breakdown
+    const assetLayerEl = document.getElementById("risk-asset-layers");
+    if(assetLayerEl) assetLayerEl.innerHTML = `
+      <div style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)">Per-Asset Layer Scores (1–5, lower is better)</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11.5px">
+        <thead><tr>
+          ${["Layer","Weight","Name",
+             "iSNR","","PDO","","uMINT","","Portfolio Avg.","Contribution"].map((h,i)=>`<th style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.1em;text-transform:uppercase;padding:0 10px 10px;text-align:${i>=3?"center":"left"};font-weight:400;border-bottom:1px solid rgba(255,255,255,.06)">${h}</th>`).join("")}
+        </tr></thead>
+        <tbody>${Object.entries(pl).map(([id,l])=>{
+          const isnr=VAULT.assets.iSNR.layers[id], pdo=VAULT.assets.PDO.layers[id], umint=VAULT.assets.uMINT.layers[id];
+          return `<tr style="border-bottom:1px solid rgba(255,255,255,.04)" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background=''">
+            <td style="padding:8px 10px">${badge(id,LAYER_C[id])}</td>
+            <td style="padding:8px 10px;font-family:${MN};font-size:10px;color:#3f3f46">${(l.weight*100).toFixed(0)}%</td>
+            <td style="padding:8px 10px;font-family:${MN};font-size:11px;color:#71717a">${l.name}</td>
+            ${[isnr,null,pdo,null,umint,null].map((v,i)=>{
+              if(v===null) return `<td></td>`;
+              return `<td style="padding:8px 4px;text-align:center"><span style="font-family:${MN};font-size:11px;color:${sc(v)}">${v.toFixed(1)}</span></td>`;
+            }).join("")}
+            <td style="padding:8px 10px;text-align:center"><span style="font-family:${MN};font-size:12px;color:${sc(l.score)};font-weight:500">${l.score.toFixed(2)}</span></td>
+            <td style="padding:8px 10px;text-align:center"><span style="font-family:${MN};font-size:10px;color:#52525b">${l.contrib.toFixed(3)}</span></td>
+          </tr>`;
+        }).join("")}
+        <tr style="border-top:1px solid rgba(255,255,255,.1)">
+          <td colspan="3" style="padding:10px;font-family:${MN};font-size:11px;color:#fafafa;font-weight:500">Weighted Composite</td>
+          ${[3.30,null,3.35,null,2.00,null].map((v,i)=>{
+            if(v===null) return `<td></td>`;
+            return `<td style="padding:10px 4px;text-align:center"><span style="font-family:${MN};font-size:12px;font-weight:500;color:${sc(v)}">${v.toFixed(2)}</span></td>`;
+          }).join("")}
+          <td style="padding:10px;text-align:center"><span style="font-family:${MN};font-size:13px;font-weight:500;color:#eab308">3.12</span></td>
+          <td style="padding:10px;text-align:center;font-family:${MN};font-size:10px;color:#eab308">B+ Moderate</td>
+        </tr>
+        </tbody>
+      </table>`;
+
+    // Radar chart
+    dc("ch-radar");
+    const radEl = document.getElementById("ch-radar");
+    if(radEl){
+      const layerIds = Object.keys(pl);
+      CH["ch-radar"] = new Chart(radEl.getContext("2d"),{
+        type:"radar",
+        data:{
+          labels:layerIds.map(id=>`${id}: ${pl[id].name.split("/")[0].trim()}`),
+          datasets:[
+            {label:"iSNR",data:layerIds.map(id=>VAULT.assets.iSNR.layers[id]),borderColor:"#818cf8",backgroundColor:"rgba(129,140,248,.1)",borderWidth:1.5,pointRadius:3},
+            {label:"PDO", data:layerIds.map(id=>VAULT.assets.PDO.layers[id]), borderColor:"#38bdf8",backgroundColor:"rgba(56,189,248,.1)",borderWidth:1.5,pointRadius:3},
+            {label:"uMINT",data:layerIds.map(id=>VAULT.assets.uMINT.layers[id]),borderColor:"#22c55e",backgroundColor:"rgba(34,197,94,.1)",borderWidth:1.5,pointRadius:3},
+          ]
+        },
+        options:{...CD,
+          scales:{r:{min:0,max:5,ticks:{display:false,stepSize:1},grid:{color:"rgba(255,255,255,.08)"},
+            pointLabels:{font:{family:MN,size:9},color:"#52525b"},angleLines:{color:"rgba(255,255,255,.06)"}}},
+          plugins:{...CD.plugins,legend:{display:true,labels:{color:"#52525b",font:{family:MN,size:9},boxWidth:10,padding:10}}}
+        }
+      });
+    }
+  }catch(e){console.error("Risk:",e);}
+};
+
+// ═══════════════════════════════════════════════════
+// PAGE 4: LTV & LEVERAGE
+// ═══════════════════════════════════════════════════
+RENDERS.ltv = function(){
+  try{
+    const hist = VAULT.history;
+    const curLtv = hist[hist.length-1]?.ltv || 0.523;
+
+    const el = document.getElementById("ltv-content");
+    if(!el) return;
+    el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:20px">
+      ${kv("Current LTV",pct(curLtv),ltvColor(curLtv),"real-time")}
+      ${kv("Operating LTV","55%","#eab308","target operating")}
+      ${kv("Ceiling LTV","62.1%","#f97316","weighted max")}
+      ${kv("Buffer","7.1pp","#22c55e","to ceiling")}
+    </div>
+
+    <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;padding:18px;margin-bottom:16px">
+      <div style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.15em;text-transform:uppercase;margin-bottom:14px">LTV Gauge — Operating Range</div>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+        <span style="font-family:${MN};font-size:10px;color:#3f3f46;min-width:24px">0%</span>
+        <div style="flex:1;position:relative;height:12px;background:rgba(255,255,255,.04);border-radius:3px;overflow:visible">
+          <div style="position:absolute;height:100%;width:${(curLtv/0.7)*100}%;background:linear-gradient(90deg,#22c55e,#eab308,#ef4444);border-radius:3px;opacity:.7"></div>
+          <!-- Operating LTV line -->
+          <div style="position:absolute;top:-4px;bottom:-4px;left:${(0.55/0.7)*100}%;width:1.5px;background:#eab308;z-index:2"></div>
+          <!-- Ceiling line -->
+          <div style="position:absolute;top:-4px;bottom:-4px;left:${(0.621/0.7)*100}%;width:1.5px;background:#ef4444;z-index:2"></div>
+          <!-- Current pointer -->
+          <div style="position:absolute;top:-6px;left:${(curLtv/0.7)*100-1}%;z-index:3">
+            <div style="font-family:${MN};font-size:9px;color:${ltvColor(curLtv)};white-space:nowrap;transform:translateX(-50%)">${pct(curLtv)}</div>
+          </div>
+        </div>
+        <span style="font-family:${MN};font-size:10px;color:#3f3f46;min-width:28px">70%</span>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:8px;font-family:${MN};font-size:10px;color:#52525b">
+        <span>● ${pct(curLtv)} current LTV</span>
+        <span style="color:#eab308">│ 55% operating target</span>
+        <span style="color:#ef4444">│ 62.1% ceiling</span>
+      </div>
+    </div>`;
+
+    // LTV chart
+    dc("ch-ltv");
+    const ltvEl = document.getElementById("ch-ltv");
+    if(ltvEl){
+      const ctx = ltvEl.getContext("2d");
+      const grad = ctx.createLinearGradient(0,0,0,150);
+      grad.addColorStop(0,"rgba(234,179,8,.2)"); grad.addColorStop(1,"rgba(234,179,8,.0)");
+      CH["ch-ltv"] = new Chart(ctx,{
+        type:"line",
+        data:{
+          labels:hist.map((h,i)=>i%7===0?h.t.slice(5,13):""),
+          datasets:[
+            {label:"LTV %",data:hist.map(h=>+(h.ltv*100).toFixed(2)),
+              borderColor:"#eab308",backgroundColor:grad,fill:true,borderWidth:1.5,pointRadius:0,tension:0.4},
+            {label:"Ceiling",data:hist.map(()=>62.1),borderColor:"rgba(239,68,68,.4)",borderDash:[3,3],borderWidth:1,pointRadius:0,fill:false},
+            {label:"Operating",data:hist.map(()=>55),borderColor:"rgba(255,255,255,.12)",borderDash:[2,4],borderWidth:1,pointRadius:0,fill:false},
+          ]
+        },
+        options:{...CD,
+          scales:{x:{...CD.scales.x,ticks:{...CD.scales.x.ticks,maxTicksLimit:7}},
+                  y:{...CD.scales.y,min:40,max:70,ticks:{...CD.scales.y.ticks,callback:v=>`${v}%`}}},
+          plugins:{...CD.plugins,legend:{display:true,labels:{color:"#52525b",font:{family:MN,size:9},boxWidth:12,padding:10}},
+            tooltip:{...CD.plugins.tooltip,callbacks:{label:(c)=>`${c.dataset.label}: ${c.raw}%`}}}
+        }
+      });
+    }
+
+    // Leverage comparison
+    const levEl = document.getElementById("ltv-leverage");
+    if(levEl) levEl.innerHTML = `
+      <div style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)">Leverage Option Analysis</div>
+      ${[
+        {lev:"1.0×",borrow:"0%",yield:"~8.5%",note:"No liquidation risk; below depositor APY target",status:"available",color:"#22c55e"},
+        {lev:"1.5×",borrow:"55%",yield:"~9–10%",note:"7.1% buffer to ceiling. B+ grade. RECOMMENDED",status:"selected",color:"#eab308"},
+        {lev:"1.75×",borrow:"57%",yield:"~10–11%",note:"2–3% below ceiling. PDO redemption lag risk. Not recommended.",status:"caution",color:"#f97316"},
+        {lev:"2.0×",borrow:"67%",yield:"~11–12%",note:"Exceeds 62.1% weighted ceiling. Immediate liquidation risk. NOT PERMITTED.",status:"blocked",color:"#ef4444"},
+      ].map(l=>`<div style="display:flex;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+        <span style="font-family:${MN};font-size:12px;color:${l.color};min-width:36px">${l.lev}</span>
+        <span style="font-family:${MN};font-size:11px;color:#71717a;min-width:40px">${l.borrow} LTV</span>
+        <span style="font-family:${MN};font-size:12px;color:#22c55e;min-width:56px">${l.yield}</span>
+        <span style="font-family:${MN};font-size:11px;color:#52525b;flex:1">${l.note}</span>
+        <span style="font-family:${MN};font-size:9px;padding:2px 7px;border-radius:2px;color:${l.color};background:${l.color}14;border:1px solid ${l.color}28">${l.status.toUpperCase()}</span>
+      </div>`).join("")}`;
+  }catch(e){console.error("LTV:",e);}
+};
+
+// ═══════════════════════════════════════════════════
+// PAGE 5: STRESS SCENARIOS
+// ═══════════════════════════════════════════════════
+RENDERS.stress = function(){
+  try{
+    const sevC = {high:"#ef4444",medium:"#eab308",low:"#22c55e",tail:"#a855f7"};
+    const el = document.getElementById("stress-content");
+    if(!el) return;
+
+    el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:20px">
+      ${VAULT.stress.map(s=>`<div style="background:#09090b;padding:16px 18px;border-left:1.5px solid ${sevC[s.severity]}">
+        <div style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.12em;margin-bottom:6px">scenario ${String(s.id).padStart(2,"0")}</div>
+        <div style="font-family:${MN};font-size:12px;color:#fafafa;margin-bottom:4px;font-weight:500">${s.name}</div>
+        <div style="font-family:${SANS};font-size:10px;color:#52525b;margin-bottom:12px">${s.trigger}</div>
+        ${s.ltv_post ? `<div style="margin-bottom:6px">
+          <div style="font-family:${MN};font-size:9px;color:#3f3f46;margin-bottom:3px">post-stress LTV</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-family:${MN};font-size:14px;color:${s.breach?"#ef4444":"#eab308"}">${pct(s.ltv_post)}</span>
+            <span style="font-family:${MN};font-size:10px;color:${s.ltv_buffer_post>0?"#22c55e":"#ef4444"}">${s.ltv_buffer_post>0?"+":""}${(s.ltv_buffer_post*100).toFixed(1)}pp ${s.ltv_buffer_post>0?"buffer":"BREACH"}</span>
+          </div>
+          ${mbar(s.ltv_post*100,s.breach?"#ef4444":"#eab308",70)}
+        </div>` : ""}
+        <div style="margin-bottom:8px">
+          <div style="font-family:${MN};font-size:9px;color:#3f3f46;margin-bottom:2px">NAV impact</div>
+          <span style="font-family:${MN};font-size:12px;color:${s.nav_impact<-0.05?"#ef4444":"#f97316"}">${s.nav_impact===-1?"up to -100%":`${(s.nav_impact*100).toFixed(1)}%`}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:${MN};font-size:9px;color:#52525b">${s.reserve}</span>
+          <span style="font-family:${MN};font-size:9px;padding:2px 6px;border-radius:2px;color:${sevC[s.severity]};background:${sevC[s.severity]}14;border:1px solid ${sevC[s.severity]}28">${s.severity}</span>
+        </div>
+        ${s.breach?`<div style="margin-top:8px;padding:4px 8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:2px;font-family:${MN};font-size:9px;color:#ef4444">⚠ CEILING BREACH — emergency protocol</div>`:""}
+      </div>`).join("")}
+    </div>
+
+    <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+      <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)">
+        <span style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.15em;text-transform:uppercase">LTV Stress Impact Chart</span>
+      </div>
+      <div style="padding:14px"><canvas id="ch-stress-ltv" style="height:160px;width:100%"></canvas></div>
+    </div>`;
+
+    // Stress LTV bar
+    dc("ch-stress-ltv");
+    const stEl = document.getElementById("ch-stress-ltv");
+    if(stEl){
+      const scenarios = VAULT.stress.filter(s=>s.ltv_post);
+      CH["ch-stress-ltv"] = new Chart(stEl.getContext("2d"),{
+        type:"bar",
+        data:{
+          labels:["Base",...scenarios.map(s=>s.name.split(" ").slice(0,2).join(" "))],
+          datasets:[
+            {label:"LTV %",data:[VAULT.operating_ltv*100,...scenarios.map(s=>s.ltv_post*100)],
+              backgroundColor:["#eab30840",...scenarios.map(s=>s.breach?"#ef444440":"#eab30840")],
+              borderColor:["#eab308",...scenarios.map(s=>s.breach?"#ef4444":"#eab308")],
+              borderWidth:1,borderRadius:2},
+            {label:"Ceiling",type:"line",data:[VAULT.ceiling_ltv*100,...scenarios.map(()=>VAULT.ceiling_ltv*100)],
+              borderColor:"rgba(239,68,68,.5)",borderDash:[3,3],borderWidth:1,pointRadius:0,fill:false},
+          ]
+        },
+        options:{...CD,
+          scales:{x:{...CD.scales.x},y:{...CD.scales.y,min:40,max:70,ticks:{...CD.scales.y.ticks,callback:v=>`${v}%`}}},
+          plugins:{...CD.plugins,
+            legend:{display:true,labels:{color:"#52525b",font:{family:MN,size:9},boxWidth:12,padding:10}},
+            tooltip:{...CD.plugins.tooltip,callbacks:{label:(c)=>`${c.dataset.label}: ${typeof c.raw==="number"?c.raw.toFixed(1)+"%":c.raw}`}}}
+        }
+      });
+    }
+  }catch(e){console.error("Stress:",e);}
+};
+
+// ═══════════════════════════════════════════════════
+// PAGE 6: PROTOCOL RESERVE
+// ═══════════════════════════════════════════════════
+RENDERS.reserve = function(){
+  try{
+    const hist = VAULT.history;
+    const curReserve = hist[hist.length-1]?.reserve || 0.102;
+    const el = document.getElementById("reserve-content");
+    if(!el) return;
+
+    el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:20px">
+      ${kv("Current Reserve Ratio",pct(curReserve),curReserve>=0.10?"#22c55e":"#eab308","target 10%")}
+      ${kv("Reserve Amount",$M(VAULT.reserve_amount),"#fafafa","protocol capital")}
+      ${kv("Cap Freeze Trigger","< 8%","#f97316","halt expansion")}
+      ${kv("Emergency Trigger","< 6%","#ef4444","forced top-up")}
+    </div>
+
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px">
+      <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;padding:16px">
+        <div style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.15em;text-transform:uppercase;margin-bottom:14px">Capital Stack</div>
+        <div style="position:relative;margin-bottom:16px">
+          <div style="height:40px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:2px;display:flex;align-items:center;padding:0 14px;margin-bottom:3px">
+            <span style="font-family:${MN};font-size:11px;color:#ef4444;flex:1">Protocol Reserve (10%) — First-Loss Tranche</span>
+            <span style="font-family:${MN};font-size:11px;color:#ef4444">${$M(VAULT.reserve_amount)}</span>
+          </div>
+          <div style="height:48px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.28);border-radius:2px;display:flex;align-items:center;padding:0 14px">
+            <span style="font-family:${MN};font-size:11px;color:#22c55e;flex:1">Senior Depositors (90%) — earn ~9–10% APY</span>
+            <span style="font-family:${MN};font-size:11px;color:#22c55e">${$M(VAULT.senior_depositors)}</span>
+          </div>
+        </div>
+        ${[
+          ["First-Loss Tranche","10% USDC absorbs losses before any lender is impacted"],
+          ["RWA Redemption Gap Cover","Reserve covers T+2–T+5 PDO redemption timing gap"],
+          ["Liquidation Slippage Buffer","Pre-funds 3–5% slippage under stress; lenders recover par"],
+          ["Self-Replenishing","50% of all curator fees continuously re-allocated to reserve"],
+          ["Reserve Trigger Protocol","<8%: cap freeze · <6%: emergency top-up · verified on-chain"],
+        ].map(([t,d])=>`<div style="padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+          <div style="font-family:${MN};font-size:11px;color:#e4e4e7;margin-bottom:2px">${t}</div>
+          <div style="font-family:${SANS};font-size:11px;color:#52525b">${d}</div>
+        </div>`).join("")}
+      </div>
+      <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+        <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)">
+          <span style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.15em;text-transform:uppercase">Phase Roadmap</span>
+        </div>
+        <div style="padding:14px">
+          ${[
+            {phase:"Phase 1",cap:"$5M",reserve:"$500K",senior:"$4.5M",note:"Current"},
+            {phase:"Phase 2\n(VA License)",cap:"$50M",reserve:"$5M",senior:"$45M",note:"Pending"},
+          ].map(p=>`<div style="padding:12px;border:1px solid rgba(255,255,255,.06);border-radius:3px;margin-bottom:10px;${p.note==="Current"?"border-color:rgba(34,197,94,.3)":""}">
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+              <span style="font-family:${MN};font-size:11px;color:#fafafa">${p.phase}</span>
+              ${badge(p.note,p.note==="Current"?"#22c55e":"#52525b")}
+            </div>
+            ${row("Vault Cap",p.cap)}
+            ${row("Reserve",p.reserve,"#ef4444")}
+            ${row("Senior",p.senior,"#22c55e")}
+          </div>`).join("")}
+        </div>
+      </div>
+    </div>
+
+    <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+      <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)">
+        <span style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.15em;text-transform:uppercase">Reserve Ratio — 7d</span>
+      </div>
+      <div style="padding:14px"><canvas id="ch-reserve" style="height:130px;width:100%"></canvas></div>
+    </div>`;
+
+    dc("ch-reserve");
+    const resEl = document.getElementById("ch-reserve");
+    if(resEl){
+      const ctx = resEl.getContext("2d");
+      const grad = ctx.createLinearGradient(0,0,0,130);
+      grad.addColorStop(0,"rgba(34,197,94,.2)"); grad.addColorStop(1,"rgba(34,197,94,.0)");
+      CH["ch-reserve"] = new Chart(ctx,{
+        type:"line",
+        data:{
+          labels:hist.map((h,i)=>i%7===0?h.t.slice(5,13):""),
+          datasets:[
+            {label:"Reserve %",data:hist.map(h=>+(h.reserve*100).toFixed(2)),
+              borderColor:"#22c55e",backgroundColor:grad,fill:true,borderWidth:1.2,pointRadius:0,tension:0.4},
+            {label:"Cap Freeze (8%)",data:hist.map(()=>8),borderColor:"rgba(239,68,68,.4)",borderDash:[3,3],borderWidth:1,pointRadius:0,fill:false},
+            {label:"Emergency (6%)",data:hist.map(()=>6),borderColor:"rgba(239,68,68,.25)",borderDash:[2,6],borderWidth:1,pointRadius:0,fill:false},
+          ]
+        },
+        options:{...CD,
+          scales:{x:{...CD.scales.x},y:{...CD.scales.y,min:4,max:14,ticks:{...CD.scales.y.ticks,callback:v=>`${v}%`}}},
+          plugins:{...CD.plugins,legend:{display:true,labels:{color:"#52525b",font:{family:MN,size:9},boxWidth:12,padding:10}},
+            tooltip:{...CD.plugins.tooltip,callbacks:{label:(c)=>`${c.dataset.label}: ${c.raw}%`}}}
+        }
+      });
+    }
+  }catch(e){console.error("Reserve:",e);}
+};
+
+// ═══════════════════════════════════════════════════
+// PAGE 7: MONITORING
+// ═══════════════════════════════════════════════════
+RENDERS.monitoring = function(){
+  try{
+    const el = document.getElementById("monitoring-content");
+    if(!el) return;
+    el.innerHTML = `
+    <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:16px">
+      <table style="width:100%;border-collapse:collapse;font-size:11.5px">
+        <thead><tr>${["Metric","Cadence","🟢 Green","🟡 Amber","🔴 Red","Red Action"].map(h=>`<th style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.12em;text-transform:uppercase;padding:10px 12px;text-align:left;font-weight:400;border-bottom:1px solid rgba(255,255,255,.06)">${h}</th>`).join("")}</tr></thead>
+        <tbody>${VAULT.monitoring.map(m=>`<tr style="border-bottom:1px solid rgba(255,255,255,.04)" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background=''">
+          <td style="padding:9px 12px;font-family:${MN};font-size:11px;color:#e4e4e7">${m.metric}</td>
+          <td style="padding:9px 12px">${badge(m.cadence,"#52525b")}</td>
+          <td style="padding:9px 12px;font-family:${MN};font-size:11px;color:#22c55e">${m.green}</td>
+          <td style="padding:9px 12px;font-family:${MN};font-size:11px;color:#eab308">${m.amber}</td>
+          <td style="padding:9px 12px;font-family:${MN};font-size:11px;color:#ef4444">${m.red}</td>
+          <td style="padding:9px 12px;font-family:${SANS};font-size:11px;color:#52525b">${m.action}</td>
+        </tr>`).join("")}</tbody>
+      </table>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;padding:16px">
+        <div style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px">Current Status (Live)</div>
+        ${[
+          ["Portfolio LTV", "52.3%", "#22c55e", "green"],
+          ["Reserve Ratio", "10.2%", "#22c55e", "green"],
+          ["iSNR NAV Drawdown", "0.4%", "#22c55e", "green"],
+          ["PDO Redemption Q", "T+2", "#22c55e", "green"],
+          ["Protocol TVL Δ (7d)", "+2.1%", "#22c55e", "green"],
+          ["uMINT Depeg", "0.01%", "#22c55e", "green"],
+          ["Oracle Heartbeat", "< 5min", "#22c55e", "green"],
+          ["Reserve/Cap", "10.0%", "#22c55e", "green"],
+        ].map(([m,v,c,s])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+          <span style="font-family:${MN};font-size:11px;color:#71717a">${m}</span>
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="font-family:${MN};font-size:11px;color:${c}">${v}</span>
+            <span style="width:6px;height:6px;border-radius:50%;background:${c};display:inline-block"></span>
+          </div>
+        </div>`).join("")}
+      </div>
+      <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;padding:16px">
+        <div style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px">NAV Tracking — 7d</div>
+        <canvas id="ch-nav" style="height:180px;width:100%"></canvas>
+      </div>
+    </div>`;
+
+    // NAV chart
+    dc("ch-nav");
+    const navEl = document.getElementById("ch-nav");
+    if(navEl){
+      const hist = VAULT.history;
+      CH["ch-nav"] = new Chart(navEl.getContext("2d"),{
+        type:"line",
+        data:{
+          labels:hist.map((h,i)=>i%7===0?h.t.slice(5,13):""),
+          datasets:[
+            {label:"iSNR",data:hist.map(h=>+h.isnr_nav.toFixed(4)),borderColor:"#818cf8",backgroundColor:"transparent",borderWidth:1.2,pointRadius:0,tension:0.3},
+            {label:"PDO", data:hist.map(h=>+h.pdo_nav.toFixed(4)), borderColor:"#38bdf8",backgroundColor:"transparent",borderWidth:1.2,pointRadius:0,tension:0.3},
+            {label:"uMINT",data:hist.map(h=>+h.umint_nav.toFixed(4)),borderColor:"#22c55e",backgroundColor:"transparent",borderWidth:1.2,pointRadius:0,tension:0.3},
+          ]
+        },
+        options:{...CD,
+          scales:{x:{...CD.scales.x,ticks:{...CD.scales.x.ticks,maxTicksLimit:7}},y:{...CD.scales.y}},
+          plugins:{...CD.plugins,legend:{display:true,labels:{color:"#52525b",font:{family:MN,size:9},boxWidth:10,padding:10}},
+            tooltip:{...CD.plugins.tooltip,callbacks:{label:(c)=>`${c.dataset.label}: ${c.raw?.toFixed(4)}`}}}
+        }
+      });
+    }
+  }catch(e){console.error("Monitoring:",e);}
+};
+
+// ═══════════════════════════════════════════════════
+// PAGE 8: VAULT REGISTRY
+// ═══════════════════════════════════════════════════
+RENDERS.vaults = function(){
+  try{
+    const el = document.getElementById("vaults-content");
+    if(!el) return;
+    el.innerHTML = `
+    <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:20px">
+      <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center">
+        <span style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.15em;text-transform:uppercase">Vault Registry</span>
+        <span style="font-family:${MN};font-size:10px;color:#52525b">1 live · more coming</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:11.5px">
+        <thead><tr>${["Vault","Status","Allocation","Grade","Score","TVL","LTV","Leverage","Action"].map(h=>`<th style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.12em;text-transform:uppercase;padding:0 12px 10px;text-align:left;font-weight:400;border-bottom:1px solid rgba(255,255,255,.06)">${h}</th>`).join("")}</tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid rgba(255,255,255,.04)">
+            <td style="padding:12px"><div style="font-family:${MN};font-size:12px;color:#fafafa">Enhancer RWA Vault v1</div><div style="font-family:${MN};font-size:10px;color:#52525b;margin-top:2px">DigiFT · Undefined Labs</div></td>
+            <td style="padding:12px"><div style="display:flex;align-items:center;gap:5px">${statusdot("live")}<span style="font-family:${MN};font-size:10px;color:#22c55e">live</span></div></td>
+            <td style="padding:12px">
+              <div style="display:flex;gap:3px">
+                ${VAULT.allocation.map(a=>`<span style="font-family:${MN};font-size:9px;padding:1px 5px;border-radius:2px;color:${a.color};background:${a.color}14;border:1px solid ${a.color}28">${a.id} ${a.weight*100}%</span>`).join("")}
+              </div>
+            </td>
+            <td style="padding:12px">${gradebadge("B+")}</td>
+            <td style="padding:12px;font-family:${MN};font-size:11px;color:#eab308">3.12/5.0</td>
+            <td style="padding:12px;font-family:${MN};font-size:12px;color:#fafafa">$4.5M</td>
+            <td style="padding:12px;font-family:${MN};font-size:12px;color:#eab308">55%</td>
+            <td style="padding:12px;font-family:${MN};font-size:12px;color:#fafafa">1.5×</td>
+            <td style="padding:12px"><button onclick="nav('overview',null)" style="font-family:${MN};font-size:10px;color:#22c55e;background:transparent;border:1px solid rgba(34,197,94,.3);border-radius:2px;padding:3px 8px;cursor:pointer">view →</button></td>
+          </tr>
+          ${[2,3].map(i=>`<tr style="border-bottom:1px solid rgba(255,255,255,.04);opacity:.4">
+            <td style="padding:12px"><div style="font-family:${MN};font-size:12px;color:#71717a">Enhancer RWA Vault v${i}</div><div style="font-family:${MN};font-size:10px;color:#3f3f46;margin-top:2px">planning stage</div></td>
+            <td style="padding:12px"><div style="display:flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:50%;background:#3f3f46;display:inline-block"></span><span style="font-family:${MN};font-size:10px;color:#3f3f46">pending</span></div></td>
+            <td colspan="7" style="padding:12px;font-family:${MN};font-size:11px;color:#3f3f46">TBD — new collateral assets to be determined per UDL Framework v0.1</td>
+          </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;padding:16px">
+        <div style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px">UDL Risk Framework v0.1</div>
+        <div style="font-family:${SANS};font-size:11px;color:#71717a;line-height:1.75;margin-bottom:14px">Six-layer composite risk classification system for tokenized TradFi collateral deployed in DeFi lending vaults. Each layer scored 1–5 (lower = lower risk) and weighted by credit risk contribution.</div>
+        ${Object.entries(VAULT.portfolio_layers).map(([id,l])=>`<div style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+          ${badge(id,LAYER_C[id])}
+          <span style="font-family:${MN};font-size:11px;color:#71717a;flex:1">${l.name}</span>
+          <span style="font-family:${MN};font-size:10px;color:#3f3f46">wt ${(l.weight*100).toFixed(0)}%</span>
+        </div>`).join("")}
+      </div>
+      <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;padding:16px">
+        <div style="font-family:${MN};font-size:9px;color:#3f3f46;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px">Grade Scale</div>
+        ${[
+          ["A (1.0–2.0)","Low Risk","#22c55e"],
+          ["A- (2.0–2.5)","Low-Moderate","#4ade80"],
+          ["B+ (2.5–3.5)","Moderate","#eab308"],
+          ["B  (3.5–4.0)","Moderate-High","#f97316"],
+          ["B- (4.0–4.5)","High","#fb923c"],
+          ["C  (4.5–5.0)","Very High","#ef4444"],
+        ].map(([g,l,c])=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+          <span style="font-family:${MN};font-size:11px;font-weight:500;min-width:80px;color:${c}">${g.split(" ")[0]}</span>
+          <span style="font-family:${MN};font-size:10px;color:#71717a;flex:1">${g.split(" ").slice(1).join(" ")} — ${l}</span>
+          <span style="width:48px;height:2px;background:${c};border-radius:1px;display:block"></span>
+        </div>`).join("")}
+        <div style="margin-top:14px;padding:10px;background:rgba(234,179,8,.06);border:1px solid rgba(234,179,8,.2);border-radius:2px">
+          <div style="font-family:${MN};font-size:10px;color:#eab308;margin-bottom:3px">Vault v1 — B+ / 3.12 / 5.0 — Moderate</div>
+          <div style="font-family:${SANS};font-size:10px;color:#52525b">Allocation-weighted: 3.30×0.55 + 3.35×0.30 + 2.00×0.15</div>
+        </div>
+      </div>
+    </div>`;
+  }catch(e){console.error("Vaults:",e);}
+};
+
+// ═══════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════
+window.addEventListener("DOMContentLoaded", function(){
+  try{ RENDERS.overview(); }
+  catch(e){ console.error("Boot:", e); }
+});
+
+</script>
+</body>
+</html>
