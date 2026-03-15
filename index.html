@@ -18,78 +18,94 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{background:var(--bg);color:var(--text);font-family:var(--mono);font-weight:300;min-height:100vh;font-size:13px}
-.sb{position:fixed;left:0;top:0;bottom:0;width:210px;background:var(--bg);border-right:1px solid var(--bdr);display:flex;flex-direction:column;z-index:200}
-.sb-logo{padding:18px 16px 14px;border-bottom:1px solid var(--bdr)}
-.logo-mark{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--text);letter-spacing:.04em}
-.logo-sub{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.16em;text-transform:uppercase;margin-top:3px}
-.logo-vault{display:flex;align-items:center;gap:7px;margin-top:10px;padding:7px 9px;background:rgba(234,179,8,.06);border:1px solid rgba(234,179,8,.18);border-radius:3px}
-.vault-id{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--yellow)}
-.vault-grade{font-family:var(--mono);font-size:9px;color:var(--yellow);margin-left:auto}
-.sb-nav{flex:1;overflow-y:auto;padding:8px 0}
-.sb-sec-lbl{font-family:var(--mono);font-size:9px;color:var(--dimmer);letter-spacing:.2em;text-transform:uppercase;padding:12px 14px 4px}
-.ni{display:flex;align-items:center;gap:7px;padding:6px 10px;margin:1px 6px;border-radius:3px;cursor:pointer;font-family:var(--mono);font-size:11.5px;font-weight:300;color:var(--muted);transition:all .1s;user-select:none;position:relative}
-.ni:hover{background:rgba(255,255,255,.04);color:var(--text)}
-.ni.active{background:rgba(255,255,255,.06);color:var(--text)}
-.ni.active::before{content:'';position:absolute;left:0;top:4px;bottom:4px;width:1.5px;background:var(--text);border-radius:1px}
-.ni-icon{width:13px;text-align:center;font-size:11px;opacity:.4;flex-shrink:0}
-.ni-badge{margin-left:auto;font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:10px}
-.nb-y{color:var(--yellow);background:rgba(234,179,8,.12)}
-.nb-g{color:var(--green);background:rgba(34,197,94,.12)}
-.sb-foot{padding:12px 14px;border-top:1px solid var(--bdr)}
-.main{margin-left:210px;min-height:100vh}
-.topbar{height:44px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg);position:sticky;top:0;z-index:100}
-.tp-title{font-family:var(--mono);font-size:13px;font-weight:400;color:var(--text)}
-.tp-tag{font-family:var(--mono);font-size:9px;color:var(--dim);padding:2px 7px;background:rgba(255,255,255,.04);border:1px solid var(--bdr);border-radius:2px;letter-spacing:.08em}
-.tp-r{margin-left:auto;display:flex;align-items:center;gap:12px}
+/* ── TOP NAV (benchmark style) ── */
+.topnav{position:fixed;top:0;left:0;right:0;z-index:300;background:var(--bg);border-bottom:1px solid var(--bdr)}
+/* Row 1: logo + clock + refresh */
+.tn-row1{height:44px;display:flex;align-items:center;padding:0 24px;gap:0;border-bottom:1px solid var(--bdr)}
+.tn-logo{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--text);letter-spacing:.04em;margin-right:6px}
+.tn-logosub{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.14em;text-transform:uppercase}
+.tn-vault-chip{display:flex;align-items:center;gap:5px;margin-left:18px;padding:3px 8px;background:rgba(234,179,8,.06);border:1px solid rgba(234,179,8,.2);border-radius:2px}
+.tn-vault-chip span{font-family:var(--mono);font-size:10px;color:var(--yellow)}
+.tn-sep{width:1px;height:16px;background:var(--bdr);margin:0 20px}
+/* Row 2: main tabs */
+.tn-row2{height:38px;display:flex;align-items:stretch;padding:0 24px;gap:0}
+.tn-tab{display:flex;align-items:center;padding:0 16px;font-family:var(--mono);font-size:11px;font-weight:300;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .12s;white-space:nowrap;user-select:none;position:relative}
+.tn-tab:hover{color:var(--text)}
+.tn-tab.active{color:var(--text);border-bottom-color:var(--text)}
+.tn-tab .tab-badge{margin-left:7px;font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:10px;background:rgba(234,179,8,.12);color:var(--yellow)}
+.tn-tab .tab-badge-g{margin-left:7px;font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:10px;background:rgba(34,197,94,.12);color:var(--green)}
+/* Row 3: sub-tabs (context nav) */
+.tn-row3{height:36px;display:flex;align-items:stretch;padding:0 24px;gap:0;border-top:1px solid var(--bdr)}
+.tn-sub{display:flex;align-items:center;padding:0 14px;font-family:var(--mono);font-size:10px;font-weight:300;color:var(--dim);cursor:pointer;border-bottom:1.5px solid transparent;transition:all .1s;white-space:nowrap;user-select:none;letter-spacing:.03em}
+.tn-sub:hover{color:var(--muted)}
+.tn-sub.active{color:var(--text);border-bottom-color:var(--text)}
+.tn-sub .sub-badge{margin-left:5px;font-family:var(--mono);font-size:8.5px;color:var(--dim)}
+/* MAIN */
+.main{margin-top:118px;min-height:calc(100vh - 118px)}
+.page{display:none;padding:18px 24px;animation:fadeIn .15s ease}
+.page.active{display:block}
+/* LEGACY compat (remove sidebar refs) */
 .btn{padding:4px 10px;border:1px solid var(--bdr);border-radius:2px;background:transparent;color:var(--muted);font-family:var(--mono);font-size:10px;cursor:pointer;letter-spacing:.06em;transition:all .1s}
 .btn:hover{border-color:var(--bdr2);color:var(--text);background:rgba(255,255,255,.04)}
-.page{display:none;padding:18px 20px;animation:fadeIn .2s ease}
-.page.active{display:block}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 ::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
 </style>
 </head>
 <body>
-<aside class="sb">
-  <div class="sb-logo">
-    <div class="logo-mark">Enhancer</div>
-    <div class="logo-sub">RWA Risk OS · Undefined Labs</div>
-    <div class="logo-vault">
-      <span style="width:5px;height:5px;border-radius:50%;background:#22c55e;animation:pulse 2s ease-in-out infinite;flex-shrink:0"></span>
-      <span class="vault-id">Vault v1</span>
-      <span class="vault-grade">B+ / 3.12</span>
+<!-- TOP NAV (benchmark style) -->
+<nav class="topnav">
+  <!-- Row 1: Logo + vault chip + clock -->
+  <div class="tn-row1">
+    <span class="tn-logo">Enhancer</span>
+    <span class="tn-logosub">RWA Risk OS</span>
+    <div class="tn-vault-chip">
+      <span style="width:5px;height:5px;border-radius:50%;background:#22c55e;animation:pulse 2s ease-in-out infinite;display:inline-block"></span>
+      <span>Vault v1</span>
+      <span style="color:#52525b;margin:0 2px">/</span>
+      <span>B+ · 3.12</span>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:14px">
+      <span id="clock" style="font-family:var(--mono);font-size:10px;color:var(--dim)"></span>
+      <div id="data-status-bar"></div>
+      <button class="btn" onclick="manualRefresh()">↺ Refresh</button>
     </div>
   </div>
-  <nav class="sb-nav">
-    <div class="sb-sec-lbl">Vault v1</div>
-    <div class="ni active" onclick="nav('overview',this)"><span class="ni-icon">◈</span>Overview</div>
-    <div class="ni" onclick="nav('allocation',this)"><span class="ni-icon">◑</span>Asset Allocation</div>
-    <div class="ni" onclick="nav('risk',this)"><span class="ni-icon">⊞</span>UDL Risk Score<span class="ni-badge nb-y">B+</span></div>
-    <div class="ni" onclick="nav('ltv',this)"><span class="ni-icon">≋</span>LTV & Leverage</div>
-    <div class="ni" onclick="nav('stress',this)"><span class="ni-icon">⚡</span>Stress Scenarios<span class="ni-badge nb-y">6</span></div>
-    <div class="ni" onclick="nav('reserve',this)"><span class="ni-icon">◉</span>Protocol Reserve</div>
-    <div class="ni" onclick="nav('monitoring',this)"><span class="ni-icon">△</span>Monitoring<span class="ni-badge nb-g">✓</span></div>
-    <div class="sb-sec-lbl">System</div>
-    <div class="ni" onclick="nav('vaults',this)"><span class="ni-icon">◇</span>Vault Registry<span class="ni-badge nb-g">1</span></div>
-  </nav>
-  <div class="sb-foot">
-    <div style="display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--dim)">
-      <span style="width:5px;height:5px;border-radius:50%;background:#22c55e;box-shadow:0 0 4px #22c55e;display:inline-block;animation:pulse 2s ease-in-out infinite"></span>all systems normal
+  <!-- Row 2: Main tabs -->
+  <div class="tn-row2">
+    <div class="tn-tab active" onclick="switchTab('vault',this)" id="maintab-vault">
+      Vault v1
     </div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--dimmer);margin-top:3px">UDL Framework v0.1 · Mar 2026</div>
+    <div class="tn-tab" onclick="switchTab('defi',this)" id="maintab-defi">
+      DeFi Market
+    </div>
+    <div class="tn-tab" onclick="switchTab('funding',this)" id="maintab-funding">
+      Funding
+    </div>
+    <div class="tn-tab" onclick="switchTab('system',this)" id="maintab-system">
+      System
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center">
+      <span style="font-family:var(--mono);font-size:9px;color:var(--dimmer)">UDL Framework v0.1 · Mar 2026</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;margin-left:16px;font-family:var(--mono);font-size:9px;color:var(--dim)">
+        <span style="width:5px;height:5px;border-radius:50%;background:#22c55e;box-shadow:0 0 4px #22c55e;display:inline-block;animation:pulse 2s ease-in-out infinite"></span>all systems normal
+      </span>
+    </div>
   </div>
-</aside>
+  <!-- Row 3: Sub-tabs (context-sensitive) -->
+  <div class="tn-row3" id="subtab-bar">
+    <!-- vault sub-tabs -->
+    <div class="tn-sub active" onclick="nav('overview',this)" id="sub-overview">Overview</div>
+    <div class="tn-sub" onclick="nav('allocation',this)" id="sub-allocation">Asset Allocation</div>
+    <div class="tn-sub" onclick="nav('risk',this)" id="sub-risk">UDL Risk Score <span class="sub-badge">B+</span></div>
+    <div class="tn-sub" onclick="nav('ltv',this)" id="sub-ltv">LTV & Leverage</div>
+    <div class="tn-sub" onclick="nav('stress',this)" id="sub-stress">Stress Scenarios <span class="sub-badge">6</span></div>
+    <div class="tn-sub" onclick="nav('reserve',this)" id="sub-reserve">Protocol Reserve</div>
+    <div class="tn-sub" onclick="nav('monitoring',this)" id="sub-monitoring">Monitoring</div>
+  </div>
+</nav>
 
 <main class="main">
-  <header class="topbar">
-    <div class="tp-title" id="page-title">Vault Overview</div>
-    <div class="tp-tag" id="page-tag">Enhancer RWA Vault v1</div>
-    <div class="tp-r">
-      <span id="clock" style="font-family:var(--mono);font-size:10px;color:var(--dim)"></span>
-      <button class="btn" onclick="location.reload()">↺</button>
-    </div>
-  </header>
 
   <!-- OVERVIEW -->
   <div class="page active" id="page-overview">
@@ -159,6 +175,26 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--mono);font-we
   <div class="page" id="page-vaults">
     <div id="vaults-content"></div>
   </div>
+  <!-- DEFI MARKET: RATE BENCHMARK -->
+  <div class="page" id="page-defi-rates">
+    <div id="defi-rates-content"></div>
+  </div>
+
+  <!-- DEFI MARKET: SUPPLY POOLS -->
+  <div class="page" id="page-defi-supply">
+    <div id="defi-supply-content"></div>
+  </div>
+
+  <!-- DEFI MARKET: BORROW POOLS -->
+  <div class="page" id="page-defi-borrow">
+    <div id="defi-borrow-content"></div>
+  </div>
+
+  <!-- FUNDING RATES -->
+  <div class="page" id="page-funding-rates">
+    <div id="funding-rates-content"></div>
+  </div>
+
 </main>
 
 <script>
@@ -281,14 +317,26 @@ const VAULT = {
   history: (() => {
     const now = Date.now();
     const pts = 42;
-    return Array.from({length:pts}, (_,i) => ({
-      t: new Date(now - (pts-1-i)*4*3600*1000).toISOString().slice(0,16),
-      ltv: 0.52 + Math.sin(i/8)*0.02 + (Math.random()-0.5)*0.005,
-      reserve: 0.102 + Math.sin(i/12)*0.005 + (Math.random()-0.5)*0.002,
-      isnr_nav: 1.000 + (Math.random()-0.5)*0.006,
-      pdo_nav:  1.000 + (Math.random()-0.52)*0.012,
-      umint_nav: 1.000 + (Math.random()-0.5)*0.001,
-    }));
+    // Realistic NAV simulation: random walk (Brownian motion) with drift + mean reversion
+    // Each asset moves smoothly rather than pure noise each step
+    let isnr = 1.0000, pdo = 1.0000, umint = 1.0000;
+    let ltv = 0.523, res = 0.102;
+    return Array.from({length:pts}, (_,i) => {
+      // Smooth random walk: small step each period
+      isnr  = isnr  + (Math.random()-0.50)*0.0008 + (1.0000-isnr)*0.05;
+      pdo   = pdo   + (Math.random()-0.50)*0.0018 + (1.0000-pdo)*0.04;
+      umint = umint + (Math.random()-0.50)*0.0002 + (1.0000-umint)*0.08;
+      ltv   = ltv   + (Math.random()-0.50)*0.004  + (0.523-ltv)*0.12;
+      res   = res   + (Math.random()-0.50)*0.001  + (0.102-res)*0.10;
+      return {
+        t: new Date(now - (pts-1-i)*4*3600*1000).toISOString().slice(0,16),
+        ltv:      Math.max(0.45, Math.min(0.62, ltv)),
+        reserve:  Math.max(0.08, Math.min(0.14, res)),
+        isnr_nav: Math.max(0.992, Math.min(1.008, isnr)),
+        pdo_nav:  Math.max(0.985, Math.min(1.015, pdo)),
+        umint_nav:Math.max(0.998, Math.min(1.002, umint)),
+      };
+    });
   })(),
 };
 
@@ -412,16 +460,80 @@ const PAGE_META = {
 const RENDERS = {};
 let currentPage = "overview";
 
+// Tab groups: which pages belong to which main tab
+const TAB_GROUPS = {
+  vault:   ["overview","allocation","risk","ltv","stress","reserve","monitoring"],
+  defi:    ["defi-rates","defi-supply","defi-borrow"],
+  funding: ["funding-rates"],
+  system:  ["vaults"],
+};
+
+// Sub-tab HTML per main tab
+const SUBTAB_HTML = {
+  vault: `
+    <div class="tn-sub" onclick="nav('overview',this)" id="sub-overview">Overview</div>
+    <div class="tn-sub" onclick="nav('allocation',this)" id="sub-allocation">Asset Allocation</div>
+    <div class="tn-sub" onclick="nav('risk',this)" id="sub-risk">UDL Risk Score <span class="sub-badge">B+</span></div>
+    <div class="tn-sub" onclick="nav('ltv',this)" id="sub-ltv">LTV &amp; Leverage</div>
+    <div class="tn-sub" onclick="nav('stress',this)" id="sub-stress">Stress Scenarios <span class="sub-badge">6</span></div>
+    <div class="tn-sub" onclick="nav('reserve',this)" id="sub-reserve">Protocol Reserve</div>
+    <div class="tn-sub" onclick="nav('monitoring',this)" id="sub-monitoring">Monitoring</div>
+  `,
+  defi: `
+    <div class="tn-sub" onclick="nav('defi-rates',this)" id="sub-defi-rates">Rate Benchmark</div>
+    <div class="tn-sub" onclick="nav('defi-supply',this)" id="sub-defi-supply">Supply Pools</div>
+    <div class="tn-sub" onclick="nav('defi-borrow',this)" id="sub-defi-borrow">Borrow Pools</div>
+  `,
+  funding: `
+    <div class="tn-sub" onclick="nav('funding-rates',this)" id="sub-funding-rates">Funding Rates</div>
+  `,
+  system: `
+    <div class="tn-sub" onclick="nav('vaults',this)" id="sub-vaults">Vault Registry <span class="sub-badge">1 live</span></div>
+  `,
+};
+
+function switchTab(tabId, el) {
+  // Activate main tab
+  document.querySelectorAll(".tn-tab").forEach(t=>t.classList.remove("active"));
+  if(el) el.classList.add("active");
+
+  // Swap sub-tab bar
+  const bar = document.getElementById("subtab-bar");
+  if(bar) bar.innerHTML = SUBTAB_HTML[tabId] || "";
+
+  // Navigate to first page of tab
+  const pages = TAB_GROUPS[tabId];
+  if(pages && pages.length) nav(pages[0], null);
+}
+
 function nav(id, el){
   currentPage = id;
+
+  // Ensure correct main tab is active
+  const mainTab = Object.entries(TAB_GROUPS).find(([,pages])=>pages.includes(id))?.[0];
+  if(mainTab) {
+    document.querySelectorAll(".tn-tab").forEach(t=>t.classList.remove("active"));
+    const mt = document.getElementById("maintab-"+mainTab);
+    if(mt) mt.classList.add("active");
+
+    // Re-render sub-tabs for this group if they don't exist yet
+    const bar = document.getElementById("subtab-bar");
+    if(bar && !document.getElementById("sub-"+id)) {
+      bar.innerHTML = SUBTAB_HTML[mainTab] || "";
+    }
+  }
+
+  // Deactivate all sub-tabs, activate current
+  document.querySelectorAll(".tn-sub").forEach(s=>s.classList.remove("active"));
+  const sub = document.getElementById("sub-"+id);
+  if(sub) sub.classList.add("active");
+  else if(el) el.classList.add("active");
+
+  // Show correct page
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.querySelectorAll(".ni").forEach(n=>n.classList.remove("active"));
   const pg = document.getElementById("page-"+id);
   if(pg) pg.classList.add("active");
-  if(el) el.classList.add("active");
-  const [t,g] = PAGE_META[id]||[id,""];
-  document.getElementById("page-title").textContent = t;
-  document.getElementById("page-tag").textContent = g;
+
   if(RENDERS[id]) RENDERS[id]();
 }
 
@@ -1042,20 +1154,52 @@ RENDERS.monitoring = function(){
     const navEl = document.getElementById("ch-nav");
     if(navEl){
       const hist = VAULT.history;
+      // Compute actual data bounds and add ±20% padding for clean Y axis
+      const allNavVals = [...hist.map(h=>h.isnr_nav),...hist.map(h=>h.pdo_nav),...hist.map(h=>h.umint_nav)];
+      const navMin = Math.min(...allNavVals);
+      const navMax = Math.max(...allNavVals);
+      const navPad = Math.max((navMax - navMin) * 0.3, 0.002);
+      const yMin = Math.floor((navMin - navPad) * 1000) / 1000;
+      const yMax = Math.ceil((navMax + navPad) * 1000) / 1000;
+
       CH["ch-nav"] = new Chart(navEl.getContext("2d"),{
         type:"line",
         data:{
           labels:hist.map((h,i)=>i%7===0?h.t.slice(5,13):""),
           datasets:[
-            {label:"iSNR",data:hist.map(h=>+h.isnr_nav.toFixed(4)),borderColor:"#818cf8",backgroundColor:"transparent",borderWidth:1.2,pointRadius:0,tension:0.3},
-            {label:"PDO", data:hist.map(h=>+h.pdo_nav.toFixed(4)), borderColor:"#38bdf8",backgroundColor:"transparent",borderWidth:1.2,pointRadius:0,tension:0.3},
-            {label:"uMINT",data:hist.map(h=>+h.umint_nav.toFixed(4)),borderColor:"#22c55e",backgroundColor:"transparent",borderWidth:1.2,pointRadius:0,tension:0.3},
+            {label:"iSNR", data:hist.map(h=>+h.isnr_nav.toFixed(4)),
+              borderColor:"#818cf8",backgroundColor:"rgba(129,140,248,.08)",
+              fill:true,borderWidth:1.5,pointRadius:0,tension:0.4},
+            {label:"PDO",  data:hist.map(h=>+h.pdo_nav.toFixed(4)),
+              borderColor:"#38bdf8",backgroundColor:"rgba(56,189,248,.08)",
+              fill:true,borderWidth:1.5,pointRadius:0,tension:0.4},
+            {label:"uMINT",data:hist.map(h=>+h.umint_nav.toFixed(4)),
+              borderColor:"#22c55e",backgroundColor:"rgba(34,197,94,.08)",
+              fill:true,borderWidth:1.5,pointRadius:0,tension:0.4},
           ]
         },
         options:{...CD,
-          scales:{x:{...CD.scales.x,ticks:{...CD.scales.x.ticks,maxTicksLimit:7}},y:{...CD.scales.y}},
-          plugins:{...CD.plugins,legend:{display:true,labels:{color:"#52525b",font:{family:MN,size:9},boxWidth:10,padding:10}},
-            tooltip:{...CD.plugins.tooltip,callbacks:{label:(c)=>`${c.dataset.label}: ${c.raw?.toFixed(4)}`}}}
+          scales:{
+            x:{...CD.scales.x,ticks:{...CD.scales.x.ticks,maxTicksLimit:7}},
+            y:{...CD.scales.y,
+               min:yMin, max:yMax,
+               ticks:{...CD.scales.y.ticks,
+                 callback:(v)=>{
+                   const d = v - 1.0;
+                   return (d>=0?"+":"")+( d*100).toFixed(2)+"%";
+                 }
+               }
+            }
+          },
+          plugins:{...CD.plugins,
+            legend:{display:true,labels:{color:"#52525b",font:{family:MN,size:9},boxWidth:10,padding:10}},
+            tooltip:{...CD.plugins.tooltip,callbacks:{
+              label:(c)=>{
+                const d = (c.raw - 1.0)*100;
+                return `${c.dataset.label}: ${c.raw?.toFixed(4)} (${d>=0?"+":""}${d.toFixed(2)}%)`;
+              }
+            }}
+          }
         }
       });
     }
@@ -1136,10 +1280,787 @@ RENDERS.vaults = function(){
 };
 
 // ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// DEFI MARKET & FUNDING PAGES
+// Data source: DeFiLlama public API (yields.llama.fi)
+// ═══════════════════════════════════════════════════
+
+const MN2 = "IBM Plex Mono,ui-monospace,Menlo,Consolas,monospace";
+const SANS2 = "'IBM Plex Sans',system-ui,sans-serif";
+
+// Protocols & chains we care about (same as benchmark)
+const TARGET_PROTOCOLS = new Set(["aave-v3","morpho","compound-v3","spark","fluid","euler-v2","kamino","sky"]);
+const TARGET_CHAINS    = new Set(["Ethereum","Base","Arbitrum","Solana","Mantle"]);
+const TARGET_STABLES   = new Set(["USDC","USDT","USDS","USDe","PYUSD","RLUSD","DAI"]);
+const PROTOCOL_LABELS  = {
+  "aave-v3":"Aave V3","morpho":"Morpho","compound-v3":"Compound V3",
+  "spark":"Spark","fluid":"Fluid","euler-v2":"Euler V2",
+  "kamino":"Kamino","sky":"Sky","compound-finance":"Compound"
+};
+
+// ── Data API config ──────────────────────────────────
+// When the scheduler/server is running locally:
+//   python run.py   →  starts server on http://localhost:8080
+// Dashboard first tries local server, falls back to DeFiLlama directly
+const DATA_API = "http://localhost:8080";
+
+// ── Cache & update tracking ───────────────────────────
+let _poolsCache   = null;
+let _manifestCache = null;
+let _poolsFetching = false;
+let _poolsCallbacks = [];
+
+// Fetch manifest (update time, benchmark summary)
+async function fetchManifest() {
+  if(_manifestCache) return _manifestCache;
+  try {
+    const r = await fetch(`${DATA_API}/data/manifest.json`, {signal: AbortSignal.timeout(3000)});
+    if(!r.ok) throw new Error("manifest not ok");
+    _manifestCache = await r.json();
+    updateDataTimestamp(_manifestCache);
+    return _manifestCache;
+  } catch(e) {
+    return null;
+  }
+}
+
+function updateDataTimestamp(manifest) {
+  if(!manifest) return;
+  const el = document.getElementById("data-status-bar");
+  if(!el) return;
+  const updated = manifest.last_updated || "—";
+  const next    = manifest.next_update_kst || "—";
+  el.innerHTML = `
+    <span style="display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;color:#3f3f46">
+      <span style="color:#22c55e">●</span>
+      Updated: ${updated}
+      &nbsp;·&nbsp;
+      Next: ${next}
+      &nbsp;·&nbsp;
+      <a href="${DATA_API}/status" target="_blank" style="color:#3f3f46;text-decoration:none">API ↗</a>
+    </span>`;
+}
+
+async function fetchPools() {
+  if(_poolsCache) return _poolsCache;
+  if(_poolsFetching) {
+    return new Promise(res => _poolsCallbacks.push(res));
+  }
+  _poolsFetching = true;
+  try {
+    // Try local scheduler API first
+    let pools = null;
+    try {
+      const r = await fetch(`${DATA_API}/data/defi_pools.json`, {signal: AbortSignal.timeout(3000)});
+      if(r.ok) {
+        const j = await r.json();
+        pools = j.pools || null;
+        if(pools) {
+          // Also fetch manifest for status bar
+          fetchManifest();
+          console.info(`[Enhancer] Loaded ${pools.length} pools from local API (${j.updated_at})`);
+        }
+      }
+    } catch(e) { /* local server not running, fall through */ }
+
+    // Fallback: call DeFiLlama directly
+    if(!pools) {
+      console.info("[Enhancer] Local API unavailable, fetching from DeFiLlama...");
+      const r = await fetch("https://yields.llama.fi/pools");
+      const j = await r.json();
+      const raw = j.data || [];
+      // Apply same filter as collector
+      pools = raw.filter(p =>
+        TARGET_PROTOCOLS.has(p.project) &&
+        TARGET_SYMBOLS.has(p.symbol) &&
+        TARGET_CHAINS.has(p.chain) &&
+        (p.tvlUsd||0) >= 500_000
+      );
+      console.info(`[Enhancer] Loaded ${pools.length} pools from DeFiLlama directly`);
+    }
+
+    _poolsCache = pools;
+    _poolsCallbacks.forEach(cb => cb(_poolsCache));
+    _poolsCallbacks = [];
+    return _poolsCache;
+  } catch(e) {
+    console.warn("Data fetch failed:", e);
+    _poolsFetching = false;
+    return [];
+  }
+}
+
+async function fetchFundingData() {
+  try {
+    const r = await fetch(`${DATA_API}/data/funding_rates.json`, {signal: AbortSignal.timeout(3000)});
+    if(r.ok) return await r.json();
+  } catch(e) { /* fall through */ }
+  return null;
+}
+
+// Filter pools for stablecoin lending
+function filterLendingPools(pools, opts={}) {
+  return pools.filter(p => {
+    if(opts.protocols && !opts.protocols.has(p.project)) return false;
+    if(opts.chains && !opts.chains.has(p.chain)) return false;
+    if(opts.symbols && !opts.symbols.has(p.symbol)) return false;
+    if(opts.minTvl && (p.tvlUsd||0) < opts.minTvl) return false;
+    return true;
+  });
+}
+
+// Compute benchmark (TVL-weighted avg supply rate)
+function computeBenchmarks(pools) {
+  const lending = filterLendingPools(pools, {
+    protocols: TARGET_PROTOCOLS, chains: TARGET_CHAINS,
+    symbols: TARGET_STABLES, minTvl: 1_000_000
+  });
+  if(!lending.length) return null;
+
+  let supplyWeightedSum = 0, supplyTvlSum = 0;
+  let borrowWeightedSum = 0, borrowTvlSum = 0;
+  let totalSupply = 0, totalBorrow = 0;
+
+  lending.forEach(p => {
+    const tvl = p.tvlUsd || 0;
+    const borrow = p.totalBorrowUsd || 0;
+    const supplyApy = (p.apyBase || 0);
+    const borrowApy = (p.apyBaseBorrow || 0);
+
+    supplyWeightedSum += supplyApy * tvl;
+    supplyTvlSum += tvl;
+    borrowWeightedSum += borrowApy * borrow;
+    borrowTvlSum += borrow;
+    totalSupply += tvl;
+    totalBorrow += borrow;
+  });
+
+  return {
+    supplyBenchmark: supplyTvlSum > 0 ? supplyWeightedSum / supplyTvlSum : 0,
+    borrowBenchmark: borrowTvlSum > 0 ? borrowWeightedSum / borrowTvlSum : 0,
+    totalSupply, totalBorrow,
+    utilization: totalSupply > 0 ? totalBorrow / totalSupply : 0,
+    marketCount: lending.length,
+    pools: lending,
+  };
+}
+
+// ── Shared UI helpers ─────────────────────────────────
+function protocolBadge(proj) {
+  const label = PROTOCOL_LABELS[proj] || proj;
+  return `<span style="font-family:${MN2};font-size:10px;color:#a1a1aa">${label}</span>`;
+}
+function chainBadge(chain) {
+  const cc = {Ethereum:"#818cf8",Base:"#38bdf8",Arbitrum:"#f97316",Solana:"#22c55e",Mantle:"#c084fc"};
+  const c = cc[chain]||"#52525b";
+  return `<span style="font-family:${MN2};font-size:9px;padding:1px 6px;border-radius:2px;color:${c};background:${c}14;border:1px solid ${c}28">${chain}</span>`;
+}
+function apyColor(v) {
+  if(!v) return "#52525b";
+  if(v >= 8) return "#22c55e";
+  if(v >= 4) return "#86efac";
+  return "#a1a1aa";
+}
+function borrowApyColor(v) {
+  if(!v) return "#52525b";
+  if(v >= 12) return "#ef4444";
+  if(v >= 8) return "#f97316";
+  return "#e4e4e7";
+}
+function utilColor(v) {
+  if(v >= 0.9) return "#ef4444";
+  if(v >= 0.75) return "#f97316";
+  if(v >= 0.5) return "#eab308";
+  return "#22c55e";
+}
+function $B(v) {
+  if(!v||v===0) return "—";
+  if(v>=1e9) return `$${(v/1e9).toFixed(2)}B`;
+  if(v>=1e6) return `$${(v/1e6).toFixed(1)}M`;
+  return `$${(v/1e3).toFixed(0)}K`;
+}
+function apyStr(v) {
+  if(!v||v===0) return "—";
+  return `${v.toFixed(2)}%`;
+}
+function utilBar(v, w=60) {
+  const c=utilColor(v);
+  return `<div style="display:flex;align-items:center;gap:6px">
+    <div style="width:${w}px;height:2px;background:rgba(255,255,255,.06);border-radius:1px;overflow:hidden">
+      <div style="height:100%;width:${Math.min(v*100,100)}%;background:${c}"></div>
+    </div>
+    <span style="font-family:${MN2};font-size:11px;color:${c}">${(v*100).toFixed(1)}%</span>
+  </div>`;
+}
+
+// Loading / error states
+function showLoading(elId, msg) {
+  const el = document.getElementById(elId);
+  if(el) el.innerHTML = `<div style="display:flex;align-items:center;gap:8px;padding:24px 0;font-family:${MN2};font-size:11px;color:#52525b">
+    <span style="display:inline-block;animation:spin 1s linear infinite">⟳</span>${msg||"Loading from DeFiLlama..."}
+  </div><style>@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>`;
+}
+function showError(elId, msg) {
+  const el = document.getElementById(elId);
+  if(el) el.innerHTML = `<div style="padding:16px;border:1px solid rgba(239,68,68,.2);border-radius:3px;background:rgba(239,68,68,.06);font-family:${MN2};font-size:11px;color:#ef4444">
+    ⚠ ${msg||"Failed to load data"}</div>`;
+}
+
+// ── Filter state ─────────────────────────────────────
+const FILTERS = {
+  defiRates:  {chain:"All",protocol:"All",stablecoin:"All"},
+  defiSupply: {chain:"All",protocol:"All",stablecoin:"All"},
+  defiBorrow: {chain:"All",protocol:"All",stablecoin:"All"},
+};
+
+function filterRow(target, key, val, el) {
+  FILTERS[target][key] = val;
+  // Highlight active button
+  const siblings = el.parentElement.querySelectorAll("button");
+  siblings.forEach(b => {
+    b.style.color = "#3f3f46";
+    b.style.borderBottom = "none";
+  });
+  el.style.color = "#fafafa";
+  el.style.borderBottom = "1.5px solid #fafafa";
+  // Re-render
+  if(target === "defiRates") renderDefiRatesTable();
+  if(target === "defiSupply") renderDefiSupplyTable();
+  if(target === "defiBorrow") renderDefiBorrowTable();
+}
+
+function filterBar(target, key, options, activeVal) {
+  return `<div style="display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:0">
+    ${options.map(o => `<button onclick="filterRow('${target}','${key}','${o}',this)"
+      style="font-family:${MN2};font-size:10px;letter-spacing:.06em;padding:7px 14px;background:transparent;border:none;cursor:pointer;white-space:nowrap;transition:color .1s;color:${o===activeVal?"#fafafa":"#3f3f46"};border-bottom:${o===activeVal?"1.5px solid #fafafa":"none"}">${o}</button>`).join("")}
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// PAGE: DEFI RATE BENCHMARK
+// ═══════════════════════════════════════════════════
+let _defiPoolsData = null;
+
+RENDERS["defi-rates"] = async function() {
+  const el = document.getElementById("defi-rates-content");
+  if(!el) return;
+
+  showLoading("defi-rates-content", "Fetching DeFiLlama yield data...");
+
+  try {
+    const pools = await fetchPools();
+    _defiPoolsData = pools;
+    const bm = computeBenchmarks(pools);
+
+    if(!bm || !bm.pools.length) {
+      showError("defi-rates-content", "No data returned. DeFiLlama API may be unavailable.");
+      return;
+    }
+
+    // KPI strip (benchmark style)
+    el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:20px">
+      <div style="background:#09090b;padding:16px 18px">
+        <div style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px">Supply Benchmark</div>
+        <div style="font-family:${MN2};font-size:22px;font-weight:500;color:#22c55e;letter-spacing:-.02em">${bm.supplyBenchmark.toFixed(2)}%</div>
+        <div style="font-family:${MN2};font-size:9px;color:#3f3f46;margin-top:4px">TVL-weighted avg supply</div>
+      </div>
+      <div style="background:#09090b;padding:16px 18px">
+        <div style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px">Borrow Benchmark</div>
+        <div style="font-family:${MN2};font-size:22px;font-weight:500;color:#f97316;letter-spacing:-.02em">${bm.borrowBenchmark.toFixed(2)}%</div>
+        <div style="font-family:${MN2};font-size:9px;color:#3f3f46;margin-top:4px">Borrow-weighted avg rate</div>
+      </div>
+      <div style="background:#09090b;padding:16px 18px">
+        <div style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px">Funding Spread</div>
+        <div style="font-family:${MN2};font-size:22px;font-weight:500;color:#e4e4e7;letter-spacing:-.02em">${(bm.borrowBenchmark - bm.supplyBenchmark).toFixed(2)}%</div>
+        <div style="font-family:${MN2};font-size:9px;color:#3f3f46;margin-top:4px">Borrow − Supply</div>
+      </div>
+      <div style="background:#09090b;padding:16px 18px">
+        <div style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px">Market Utilization</div>
+        <div style="font-family:${MN2};font-size:22px;font-weight:500;color:${utilColor(bm.utilization)};letter-spacing:-.02em">${(bm.utilization*100).toFixed(1)}%</div>
+        <div style="font-family:${MN2};font-size:9px;color:#3f3f46;margin-top:4px">Total Borrow / Supply</div>
+      </div>
+      <div style="background:#09090b;padding:16px 18px">
+        <div style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px">Total Supply</div>
+        <div style="font-family:${MN2};font-size:22px;font-weight:500;color:#e4e4e7;letter-spacing:-.02em">${$B(bm.totalSupply)}</div>
+        <div style="font-family:${MN2};font-size:9px;color:#3f3f46;margin-top:4px">Stablecoin supply</div>
+      </div>
+      <div style="background:#09090b;padding:16px 18px">
+        <div style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px">Markets (≥$1M)</div>
+        <div style="font-family:${MN2};font-size:22px;font-weight:500;color:#e4e4e7;letter-spacing:-.02em">${bm.marketCount}</div>
+        <div style="font-family:${MN2};font-size:9px;color:#3f3f46;margin-top:4px">Active lending pools</div>
+      </div>
+    </div>
+    <div id="defi-rates-filters"></div>
+    <div id="defi-rates-table"></div>`;
+
+    renderDefiRatesTable();
+  } catch(e) {
+    showError("defi-rates-content", `Error: ${e.message}`);
+  }
+};
+
+function renderDefiRatesTable() {
+  if(!_defiPoolsData) return;
+  const f = FILTERS.defiRates;
+  const el = document.getElementById("defi-rates-filters");
+  const tel = document.getElementById("defi-rates-table");
+  if(!el||!tel) return;
+
+  const chains = ["All",...[...new Set(_defiPoolsData.filter(p=>TARGET_PROTOCOLS.has(p.project)&&TARGET_STABLES.has(p.symbol)).map(p=>p.chain))].filter(c=>TARGET_CHAINS.has(c)).sort()];
+  const protocols = ["All",...Object.keys(PROTOCOL_LABELS).filter(k=>[..._defiPoolsData].some(p=>p.project===k))];
+  const stables = ["All",...TARGET_STABLES];
+
+  el.innerHTML = `
+    <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:14px">
+      <div style="display:flex;align-items:center;padding:0 14px;border-bottom:1px solid rgba(255,255,255,.06)">
+        <span style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.12em;text-transform:uppercase;padding:8px 0;margin-right:16px">Chain</span>
+        ${filterBar("defiRates","chain",chains,f.chain)}
+      </div>
+      <div style="display:flex;align-items:center;padding:0 14px;border-bottom:1px solid rgba(255,255,255,.06)">
+        <span style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.12em;text-transform:uppercase;padding:8px 0;margin-right:16px">Protocol</span>
+        ${filterBar("defiRates","protocol",protocols.map(p=>PROTOCOL_LABELS[p]||p),f.protocol==="All"?"All":PROTOCOL_LABELS[f.protocol]||f.protocol)}
+      </div>
+      <div style="display:flex;align-items:center;padding:0 14px">
+        <span style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.12em;text-transform:uppercase;padding:8px 0;margin-right:16px">Asset</span>
+        ${filterBar("defiRates","stablecoin",stables,f.stablecoin)}
+      </div>
+    </div>`;
+
+  // Filter pools
+  let filtered = _defiPoolsData.filter(p => {
+    if(!TARGET_PROTOCOLS.has(p.project)) return false;
+    if(!TARGET_STABLES.has(p.symbol)) return false;
+    if(!TARGET_CHAINS.has(p.chain)) return false;
+    if((p.tvlUsd||0) < 1_000_000) return false;
+    if(f.chain !== "All" && p.chain !== f.chain) return false;
+    if(f.stablecoin !== "All" && p.symbol !== f.stablecoin) return false;
+    if(f.protocol !== "All") {
+      const proto = PROTOCOL_LABELS[p.project]||p.project;
+      if(proto !== f.protocol) return false;
+    }
+    return true;
+  }).sort((a,b) => (b.apyBase||0) - (a.apyBase||0));
+
+  if(!filtered.length) {
+    tel.innerHTML = `<div style="padding:20px;font-family:${MN2};font-size:11px;color:#3f3f46">No pools match current filters.</div>`;
+    return;
+  }
+
+  tel.innerHTML = `<div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr>
+        ${["Protocol","Chain","Asset","Supply APY ↓","Borrow APY","TVL","Total Borrowing","Utilization"].map(h=>`<th style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.1em;text-transform:uppercase;padding:10px 12px;text-align:left;font-weight:400;border-bottom:1px solid rgba(255,255,255,.06);white-space:nowrap">${h}</th>`).join("")}
+      </tr></thead>
+      <tbody>${filtered.map(p=>`<tr style="border-bottom:1px solid rgba(255,255,255,.04)" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background=''">
+        <td style="padding:9px 12px">${protocolBadge(p.project)}</td>
+        <td style="padding:9px 12px">${chainBadge(p.chain)}</td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:11px;color:#e4e4e7;font-weight:500">${p.symbol}</td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:12px;color:${apyColor(p.apyBase||0)};font-weight:500">${apyStr(p.apyBase)}</td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:12px;color:${borrowApyColor(p.apyBaseBorrow||0)}">${apyStr(p.apyBaseBorrow)}</td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:11px;color:#a1a1aa">${$B(p.tvlUsd)}</td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:11px;color:#a1a1aa">${$B(p.totalBorrowUsd)}</td>
+        <td style="padding:9px 12px">${utilBar(p.totalBorrowUsd&&p.tvlUsd?(p.totalBorrowUsd/(p.tvlUsd+p.totalBorrowUsd)):0)}</td>
+      </tr>`).join("")}</tbody>
+    </table>
+    <div style="padding:8px 12px;border-top:1px solid rgba(255,255,255,.06);font-family:${MN2};font-size:9px;color:#3f3f46">
+      ${filtered.length} pools · Source: DeFiLlama yields.llama.fi · Updated hourly
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// PAGE: SUPPLY POOLS
+// ═══════════════════════════════════════════════════
+RENDERS["defi-supply"] = async function() {
+  const el = document.getElementById("defi-supply-content");
+  if(!el) return;
+  showLoading("defi-supply-content");
+  try {
+    const pools = await fetchPools();
+    _defiPoolsData = pools;
+    el.innerHTML = `
+    <div id="defi-supply-filters"></div>
+    <div id="defi-supply-table"></div>`;
+    renderDefiSupplyTable();
+  } catch(e) { showError("defi-supply-content", e.message); }
+};
+
+function renderDefiSupplyTable() {
+  if(!_defiPoolsData) return;
+  const f = FILTERS.defiSupply;
+  const el = document.getElementById("defi-supply-filters");
+  const tel = document.getElementById("defi-supply-table");
+  if(!el||!tel) return;
+
+  const chains = ["All",...[...TARGET_CHAINS]];
+  const stables = ["All",...TARGET_STABLES];
+  const protocols = ["All",...Object.values(PROTOCOL_LABELS)];
+
+  el.innerHTML = `<div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:14px">
+    <div style="display:flex;padding:0 14px;border-bottom:1px solid rgba(255,255,255,.06)">
+      <span style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.12em;text-transform:uppercase;padding:8px 0;margin-right:16px;white-space:nowrap">Protocol</span>
+      ${filterBar("defiSupply","protocol",protocols,f.protocol)}
+    </div>
+    <div style="display:flex;padding:0 14px;border-bottom:1px solid rgba(255,255,255,.06)">
+      <span style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.12em;text-transform:uppercase;padding:8px 0;margin-right:16px;white-space:nowrap">Chain</span>
+      ${filterBar("defiSupply","chain",chains,f.chain)}
+    </div>
+    <div style="display:flex;padding:0 14px">
+      <span style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.12em;text-transform:uppercase;padding:8px 0;margin-right:16px;white-space:nowrap">Asset</span>
+      ${filterBar("defiSupply","stablecoin",stables,f.stablecoin)}
+    </div>
+  </div>`;
+
+  let filtered = _defiPoolsData.filter(p => {
+    if(!TARGET_PROTOCOLS.has(p.project)) return false;
+    if(!TARGET_STABLES.has(p.symbol)) return false;
+    if(!TARGET_CHAINS.has(p.chain)) return false;
+    if((p.tvlUsd||0) < 500_000) return false;
+    if(f.chain !== "All" && p.chain !== f.chain) return false;
+    if(f.stablecoin !== "All" && p.symbol !== f.stablecoin) return false;
+    if(f.protocol !== "All") {
+      const proto = PROTOCOL_LABELS[p.project]||p.project;
+      if(proto !== f.protocol) return false;
+    }
+    return true;
+  }).sort((a,b) => (b.apyBase||0) - (a.apyBase||0));
+
+  tel.innerHTML = `<div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+    <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)">
+      <span style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase">Supply Pools — ${filtered.length} results</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr>
+        ${["Pool","Chain","Current Supply Rate ↓","Total Supply","Total Borrow","Utilization","7d Avg APY"].map(h=>`<th style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.1em;text-transform:uppercase;padding:10px 12px;text-align:left;font-weight:400;border-bottom:1px solid rgba(255,255,255,.06);white-space:nowrap">${h}</th>`).join("")}
+      </tr></thead>
+      <tbody>${filtered.map(p=>`<tr style="border-bottom:1px solid rgba(255,255,255,.04)" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background=''">
+        <td style="padding:9px 12px">
+          <div style="font-family:${MN2};font-size:11px;color:#e4e4e7">${PROTOCOL_LABELS[p.project]||p.project}</div>
+          <div style="font-family:${MN2};font-size:10px;color:#52525b;margin-top:1px">${p.symbol}</div>
+        </td>
+        <td style="padding:9px 12px">${chainBadge(p.chain)}</td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:13px;color:${apyColor(p.apyBase||0)};font-weight:500">${apyStr(p.apyBase)}</td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:11px;color:#a1a1aa">${$B(p.tvlUsd)}</td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:11px;color:#a1a1aa">${$B(p.totalBorrowUsd)}</td>
+        <td style="padding:9px 12px">${utilBar(p.totalBorrowUsd&&p.tvlUsd?(p.totalBorrowUsd/(p.tvlUsd+p.totalBorrowUsd)):0)}</td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:11px;color:#71717a">${apyStr(p.apyBase7d)}</td>
+      </tr>`).join("")}</tbody>
+    </table>
+    <div style="padding:8px 12px;border-top:1px solid rgba(255,255,255,.06);font-family:${MN2};font-size:9px;color:#3f3f46">
+      Source: DeFiLlama yields.llama.fi · Updated hourly
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// PAGE: BORROW POOLS
+// ═══════════════════════════════════════════════════
+RENDERS["defi-borrow"] = async function() {
+  const el = document.getElementById("defi-borrow-content");
+  if(!el) return;
+  showLoading("defi-borrow-content");
+  try {
+    const pools = await fetchPools();
+    _defiPoolsData = pools;
+    el.innerHTML = `
+    <div id="defi-borrow-filters"></div>
+    <div id="defi-borrow-table"></div>`;
+    renderDefiBorrowTable();
+  } catch(e) { showError("defi-borrow-content", e.message); }
+};
+
+function renderDefiBorrowTable() {
+  if(!_defiPoolsData) return;
+  const f = FILTERS.defiBorrow;
+  const el = document.getElementById("defi-borrow-filters");
+  const tel = document.getElementById("defi-borrow-table");
+  if(!el||!tel) return;
+
+  const chains = ["All",...[...TARGET_CHAINS]];
+  const stables = ["All",...TARGET_STABLES];
+  const protocols = ["All",...Object.values(PROTOCOL_LABELS)];
+
+  el.innerHTML = `<div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:14px">
+    <div style="display:flex;padding:0 14px;border-bottom:1px solid rgba(255,255,255,.06)">
+      <span style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.12em;text-transform:uppercase;padding:8px 0;margin-right:16px;white-space:nowrap">Protocol</span>
+      ${filterBar("defiBorrow","protocol",protocols,f.protocol)}
+    </div>
+    <div style="display:flex;padding:0 14px;border-bottom:1px solid rgba(255,255,255,.06)">
+      <span style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.12em;text-transform:uppercase;padding:8px 0;margin-right:16px;white-space:nowrap">Chain</span>
+      ${filterBar("defiBorrow","chain",chains,f.chain)}
+    </div>
+    <div style="display:flex;padding:0 14px">
+      <span style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.12em;text-transform:uppercase;padding:8px 0;margin-right:16px;white-space:nowrap">Asset</span>
+      ${filterBar("defiBorrow","stablecoin",stables,f.stablecoin)}
+    </div>
+  </div>`;
+
+  // Borrow pools: need apyBaseBorrow > 0
+  let filtered = _defiPoolsData.filter(p => {
+    if(!TARGET_PROTOCOLS.has(p.project)) return false;
+    if(!TARGET_STABLES.has(p.symbol)) return false;
+    if(!TARGET_CHAINS.has(p.chain)) return false;
+    if(!(p.apyBaseBorrow > 0)) return false;
+    if((p.totalBorrowUsd||0) < 100_000) return false;
+    if(f.chain !== "All" && p.chain !== f.chain) return false;
+    if(f.stablecoin !== "All" && p.symbol !== f.stablecoin) return false;
+    if(f.protocol !== "All") {
+      const proto = PROTOCOL_LABELS[p.project]||p.project;
+      if(proto !== f.protocol) return false;
+    }
+    return true;
+  }).sort((a,b) => (a.apyBaseBorrow||0) - (b.apyBaseBorrow||0));
+
+  tel.innerHTML = `<div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+    <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)">
+      <span style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase">Borrow Pools — ${filtered.length} results · sorted by lowest borrow rate</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr>
+        ${["Pool","Chain","Borrow APY ↑","Supply APY","Total Borrow","Total Supply","LTV","Utilization"].map(h=>`<th style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.1em;text-transform:uppercase;padding:10px 12px;text-align:left;font-weight:400;border-bottom:1px solid rgba(255,255,255,.06);white-space:nowrap">${h}</th>`).join("")}
+      </tr></thead>
+      <tbody>${filtered.map(p=>`<tr style="border-bottom:1px solid rgba(255,255,255,.04)" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background=''">
+        <td style="padding:9px 12px">
+          <div style="font-family:${MN2};font-size:11px;color:#e4e4e7">${PROTOCOL_LABELS[p.project]||p.project}</div>
+          <div style="font-family:${MN2};font-size:10px;color:#52525b;margin-top:1px">${p.symbol}</div>
+        </td>
+        <td style="padding:9px 12px">${chainBadge(p.chain)}</td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:13px;color:${borrowApyColor(p.apyBaseBorrow||0)};font-weight:500">${apyStr(p.apyBaseBorrow)}</td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:11px;color:${apyColor(p.apyBase||0)}">${apyStr(p.apyBase)}</td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:11px;color:#a1a1aa">${$B(p.totalBorrowUsd)}</td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:11px;color:#a1a1aa">${$B(p.tvlUsd)}</td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:11px;color:#e4e4e7">${p.ltv?(p.ltv*100).toFixed(0)+"%":"—"}</td>
+        <td style="padding:9px 12px">${utilBar(p.totalBorrowUsd&&p.tvlUsd?(p.totalBorrowUsd/(p.tvlUsd+p.totalBorrowUsd)):0)}</td>
+      </tr>`).join("")}</tbody>
+    </table>
+    <div style="padding:8px 12px;border-top:1px solid rgba(255,255,255,.06);font-family:${MN2};font-size:9px;color:#3f3f46">
+      Source: DeFiLlama yields.llama.fi · Updated hourly
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// PAGE: FUNDING RATES
+// ═══════════════════════════════════════════════════
+const FUNDING_ASSETS = ["BTC","ETH","SOL","XRP","DOGE","PEPE","WIF"];
+const FUNDING_EXCHANGES = ["Binance","Bybit","OKX","dYdX","Hyperliquid"];
+
+RENDERS["funding-rates"] = async function() {
+  const el = document.getElementById("funding-rates-content");
+  if(!el) return;
+  showLoading("funding-rates-content", "Fetching perpetual funding rates...");
+  try {
+    // Try local scheduler API first (pre-fetched data)
+    const localData = await fetchFundingData();
+    if(localData && localData.rates && localData.rates.length > 0) {
+      renderFundingPageFromLocal(el, localData);
+      return;
+    }
+    // Fallback: live Binance API call
+    renderFundingPage(el, []);
+  } catch(e) {
+    renderFundingPage(el, []);
+  }
+};
+
+function renderFundingPage(el, rawData) {
+  // Build funding rate display
+  // Note: DeFiLlama free funding endpoint may not be available without API key
+  // Show what data we CAN get and explain the rest
+
+  const hasPerps = rawData.some(p => p.apyBaseBorrow && p.symbol && !TARGET_STABLES.has(p.symbol));
+
+  const perpData = hasPerps ? rawData.filter(p =>
+    ["BTC","ETH","SOL","XRP","DOGE"].some(s => p.symbol?.includes(s)) &&
+    p.apyBaseBorrow
+  ).sort((a,b) => (b.apyBaseBorrow||0) - (a.apyBaseBorrow||0)).slice(0,20) : [];
+
+  el.innerHTML = `
+  <!-- KPI strip (funding benchmarks) -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:20px" id="funding-kpis">
+    ${FUNDING_ASSETS.slice(0,5).map(a=>`<div style="background:#09090b;padding:16px 18px">
+      <div style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px">${a} Avg Funding</div>
+      <div id="frate-${a}" style="font-family:${MN2};font-size:22px;font-weight:500;color:#e4e4e7;letter-spacing:-.02em">—</div>
+      <div style="font-family:${MN2};font-size:9px;color:#3f3f46;margin-top:4px">OI-weighted (8h ann.)</div>
+    </div>`).join("")}
+  </div>
+
+  <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:16px">
+    <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)">
+      <span style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase">Current Funding Rates</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr>
+        ${["Asset","Exchange","Funding Rate (8h)","Annualized","Next Settlement"].map(h=>`<th style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.1em;text-transform:uppercase;padding:10px 12px;text-align:left;font-weight:400;border-bottom:1px solid rgba(255,255,255,.06)">${h}</th>`).join("")}
+      </tr></thead>
+      <tbody id="funding-table-body">
+        <tr><td colspan="5" style="padding:16px 12px;font-family:${MN2};font-size:11px;color:#3f3f46">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;padding:14px;background:rgba(255,255,255,.02)">
+    <div style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px">Data Sources for Funding Rates</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      ${[
+        {name:"Coinglass API",url:"https://open-api-v3.coinglass.com",desc:"Funding rates, OI, liquidations. Free tier: 30 req/min",endpoint:"/api/futures/fundingRate/ohlc-history",badge:"recommended"},
+        {name:"Binance API",url:"https://fapi.binance.com",desc:"USDT-margined funding rates. Free, no auth required",endpoint:"/fapi/v1/fundingRate?symbol=BTCUSDT",badge:"free"},
+        {name:"Bybit API",url:"https://api.bybit.com",desc:"Linear perpetual funding history. Free, no auth",endpoint:"/v5/market/funding/history?category=linear",badge:"free"},
+        {name:"OKX API",url:"https://www.okx.com",desc:"Funding rate history for all perps",endpoint:"/api/v5/public/funding-rate-history",badge:"free"},
+        {name:"dYdX v4",url:"https://indexer.dydx.trade",desc:"On-chain perp funding from dYdX Chain",endpoint:"/v4/perpetualMarkets",badge:"free"},
+        {name:"Hyperliquid API",url:"https://api.hyperliquid.xyz",desc:"Perp funding rates from HL orderbook",endpoint:"/info (fundingHistory)",badge:"free"},
+      ].map(s=>`<div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;padding:12px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+          <span style="font-family:${MN2};font-size:11px;color:#e4e4e7">${s.name}</span>
+          <span style="font-family:${MN2};font-size:9px;padding:1px 6px;border-radius:2px;color:${s.badge==="recommended"?"#22c55e":"#818cf8"};background:${s.badge==="recommended"?"rgba(34,197,94,.1)":"rgba(129,140,248,.1)"};border:1px solid ${s.badge==="recommended"?"rgba(34,197,94,.25)":"rgba(129,140,248,.25)"}">${s.badge}</span>
+        </div>
+        <div style="font-family:${MN2};font-size:9px;color:#52525b;margin-bottom:6px">${s.desc}</div>
+        <div style="font-family:${MN2};font-size:9px;color:#3f3f46;background:rgba(255,255,255,.04);padding:4px 7px;border-radius:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.endpoint}</div>
+      </div>`).join("")}
+    </div>
+  </div>`;
+
+  // Load real funding data from Binance (free, no auth)
+  loadBinanceFundingRates();
+}
+
+
+// Render funding page from local scheduler data
+function renderFundingPageFromLocal(el, data) {
+  const MN2_L = "IBM Plex Mono,ui-monospace,Menlo,Consolas,monospace";
+  const by_asset = data.by_asset || {};
+  const all_rates = data.rates || [];
+  const updated = data.updated_at || "—";
+
+  // Build KPI strip (OI-weighted averages)
+  const kpiAssets = ["BTC","ETH","SOL","XRP","DOGE"];
+  const kpiHtml = kpiAssets.map(a => {
+    const d = by_asset[a];
+    const val = d ? `${d.avg_ann.toFixed(1)}%` : "—";
+    const color = d ? (d.avg_ann > 50?"#ef4444":d.avg_ann>20?"#f97316":d.avg_ann>0?"#22c55e":"#818cf8") : "#52525b";
+    return `<div style="background:#09090b;padding:16px 18px">
+      <div style="font-family:${MN2_L};font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px">${a} Avg Funding</div>
+      <div style="font-family:${MN2_L};font-size:22px;font-weight:500;color:${color};letter-spacing:-.02em">${val}</div>
+      <div style="font-family:${MN2_L};font-size:9px;color:#3f3f46;margin-top:4px">OI-weighted (8h ann.)</div>
+    </div>`;
+  }).join("");
+
+  // Build table rows
+  const rows = all_rates.map(r => {
+    const c = r.funding_ann > 50?"#ef4444":r.funding_ann>20?"#f97316":r.funding_ann>0?"#22c55e":"#818cf8";
+    const exchColor = r.exchange==="Binance"?"#f59e0b":r.exchange==="Bybit"?"#f97316":"#818cf8";
+    return `<tr style="border-bottom:1px solid rgba(255,255,255,.04)" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background=''">
+      <td style="padding:9px 12px;font-family:${MN2_L};font-size:12px;color:#e4e4e7;font-weight:500">${r.symbol}/USDT</td>
+      <td style="padding:9px 12px"><span style="font-family:${MN2_L};font-size:10px;color:${exchColor}">${r.exchange}</span></td>
+      <td style="padding:9px 12px;font-family:${MN2_L};font-size:12px;color:${c};font-weight:500">${r.funding_rate_8h.toFixed(4)}%</td>
+      <td style="padding:9px 12px;font-family:${MN2_L};font-size:12px;color:${c}">${r.funding_ann.toFixed(1)}%</td>
+      <td style="padding:9px 12px;font-family:${MN2_L};font-size:11px;color:#52525b">${r.next_funding_ts ? new Date(r.next_funding_ts).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"}) : "—"}</td>
+    </tr>`;
+  }).join("");
+
+  el.innerHTML = `
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:20px">
+    ${kpiHtml}
+  </div>
+  <div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+    <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center">
+      <span style="font-family:${MN2_L};font-size:9px;color:#3f3f46;letter-spacing:.14em;text-transform:uppercase">Current Funding Rates</span>
+      <span style="font-family:${MN2_L};font-size:9px;color:#3f3f46">Collected: ${updated}</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr>
+        ${["Asset","Exchange","Funding Rate (8h)","Annualized","Next Settlement"].map(h=>`<th style="font-family:${MN2_L};font-size:9px;color:#3f3f46;letter-spacing:.1em;text-transform:uppercase;padding:10px 12px;text-align:left;font-weight:400;border-bottom:1px solid rgba(255,255,255,.06)">${h}</th>`).join("")}
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="padding:8px 12px;border-top:1px solid rgba(255,255,255,.06);font-family:${MN2_L};font-size:9px;color:#3f3f46">
+      Source: Binance FAPI + Bybit API via local scheduler · ${updated}
+    </div>
+  </div>`;
+}
+
+async function loadBinanceFundingRates() {
+  try {
+    const symbols = ["BTCUSDT","ETHUSDT","SOLUSDT","XRPUSDT","DOGEUSDT","PEPEUSDT","WIFUSDT"];
+    const results = await Promise.allSettled(
+      symbols.map(s => fetch(`https://fapi.binance.com/fapi/v1/premiumIndex?symbol=${s}`).then(r=>r.json()))
+    );
+
+    const data = results
+      .filter(r => r.status === "fulfilled" && !r.value.code)
+      .map(r => r.value);
+
+    if(!data.length) {
+      document.getElementById("funding-table-body").innerHTML = `<tr><td colspan="5" style="padding:16px 12px;font-family:${MN2};font-size:11px;color:#52525b">Funding rate API unavailable from this network. Connect via browser to load live data.</td></tr>`;
+      return;
+    }
+
+    // Update KPIs
+    data.forEach(d => {
+      const sym = d.symbol?.replace("USDT","");
+      const rateAnn = parseFloat(d.lastFundingRate||0) * 3 * 365 * 100;
+      const el = document.getElementById(`frate-${sym}`);
+      if(el) {
+        const color = rateAnn > 50 ? "#ef4444" : rateAnn > 20 ? "#f97316" : rateAnn > 0 ? "#22c55e" : "#818cf8";
+        el.textContent = `${rateAnn.toFixed(1)}%`;
+        el.style.color = color;
+      }
+    });
+
+    // Update table
+    const now = Date.now();
+    const rows = data.map(d => {
+      const sym = d.symbol?.replace("USDT","");
+      const rate8h = parseFloat(d.lastFundingRate||0) * 100;
+      const rateAnn = rate8h * 3 * 365;
+      const nextTime = d.nextFundingTime ? new Date(d.nextFundingTime).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"}) : "—";
+      const rateColor = rateAnn > 50 ? "#ef4444" : rateAnn > 20 ? "#f97316" : rateAnn > 0 ? "#22c55e" : "#818cf8";
+      return `<tr style="border-bottom:1px solid rgba(255,255,255,.04)" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background=''">
+        <td style="padding:9px 12px;font-family:${MN2};font-size:12px;color:#e4e4e7;font-weight:500">${sym}/USDT</td>
+        <td style="padding:9px 12px"><span style="font-family:${MN2};font-size:10px;color:#f59e0b">Binance</span></td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:12px;color:${rateColor};font-weight:500">${rate8h.toFixed(4)}%</td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:12px;color:${rateColor}">${rateAnn.toFixed(1)}%</td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:11px;color:#52525b">${nextTime}</td>
+      </tr>`;
+    }).join("");
+
+    const tbody = document.getElementById("funding-table-body");
+    if(tbody) {
+      tbody.innerHTML = rows + `<tr><td colspan="5" style="padding:8px 12px;font-family:${MN2};font-size:9px;color:#3f3f46">Source: Binance FAPI · ${new Date().toLocaleTimeString("ko-KR")} KST</td></tr>`;
+    }
+  } catch(e) {
+    const tbody = document.getElementById("funding-table-body");
+    if(tbody) tbody.innerHTML = `<tr><td colspan="5" style="padding:16px 12px;font-family:${MN2};font-size:11px;color:#52525b">Live data unavailable (CORS/network). Use backend proxy for production.</td></tr>`;
+  }
+}
+
+
+// Manual refresh — clears cache and re-fetches
+async function manualRefresh() {
+  _poolsCache    = null;
+  _manifestCache = null;
+  _poolsFetching = false;
+  _poolsCallbacks = [];
+  const btn = document.querySelector(".btn");
+  if(btn) { btn.textContent = "Loading..."; btn.disabled = true; }
+  try {
+    // Try to trigger server-side refresh first
+    await fetch(`${DATA_API}/refresh`, {method:"POST", signal: AbortSignal.timeout(2000)}).catch(()=>{});
+  } catch(e) {}
+  // Re-render current page
+  if(RENDERS[currentPage]) await RENDERS[currentPage]();
+  if(btn) { btn.textContent = "↺ Refresh"; btn.disabled = false; }
+}
+
 // BOOT
 // ═══════════════════════════════════════════════════
-window.addEventListener("DOMContentLoaded", function(){
-  try{ RENDERS.overview(); }
+window.addEventListener("DOMContentLoaded", async function(){
+  try{
+    // Fetch manifest in background to show update status
+    fetchManifest().catch(()=>{});
+    RENDERS.overview();
+  }
   catch(e){ console.error("Boot:", e); }
 });
 
