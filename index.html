@@ -1302,7 +1302,7 @@ const PROTOCOL_LABELS  = {
 // When the scheduler/server is running locally:
 //   python run.py   →  starts server on http://localhost:8080
 // Dashboard first tries local server, falls back to DeFiLlama directly
-const DATA_API = "http://localhost:8080";
+const DATA_API = ""; // Vercel API routes
 
 // ── Cache & update tracking ───────────────────────────
 let _poolsCache   = null;
@@ -1351,10 +1351,11 @@ async function fetchPools() {
     // Try local scheduler API first
     let pools = null;
     try {
-      const r = await fetch(`${DATA_API}/data/defi_pools.json`, {signal: AbortSignal.timeout(3000)});
+      const r = await fetch(`${DATA_API}/api/defi`, {signal: AbortSignal.timeout(3000)});
       if(r.ok) {
         const j = await r.json();
-        pools = j.pools || null;
+        // /api/defi returns { pools: [...], benchmark: {...} }
+        pools = j.pools || j.data || null;
         if(pools) {
           // Also fetch manifest for status bar
           fetchManifest();
@@ -1366,9 +1367,9 @@ async function fetchPools() {
     // Fallback: call DeFiLlama directly
     if(!pools) {
       console.info("[Enhancer] Local API unavailable, fetching from DeFiLlama...");
-      const r = await fetch("https://yields.llama.fi/pools");
+      const r = await fetch(`${DATA_API}/api/defi`);
       const j = await r.json();
-      const raw = j.data || [];
+      const raw = j.pools || j.data || [];
       // Apply same filter as collector
       pools = raw.filter(p =>
         TARGET_PROTOCOLS.has(p.project) &&
@@ -1392,7 +1393,7 @@ async function fetchPools() {
 
 async function fetchFundingData() {
   try {
-    const r = await fetch(`${DATA_API}/data/funding_rates.json`, {signal: AbortSignal.timeout(3000)});
+    const r = await fetch(`${DATA_API}/api/funding`, {signal: AbortSignal.timeout(3000)});
     if(r.ok) return await r.json();
   } catch(e) { /* fall through */ }
   return null;
@@ -1982,19 +1983,26 @@ function renderFundingPageFromLocal(el, data) {
 
 async function loadBinanceFundingRates() {
   try {
-    const symbols = ["BTCUSDT","ETHUSDT","SOLUSDT","XRPUSDT","DOGEUSDT","PEPEUSDT","WIFUSDT"];
-    const results = await Promise.allSettled(
-      symbols.map(s => fetch(`https://fapi.binance.com/fapi/v1/premiumIndex?symbol=${s}`).then(r=>r.json()))
-    );
-
-    const data = results
-      .filter(r => r.status === "fulfilled" && !r.value.code)
-      .map(r => r.value);
+    // Use Vercel proxy instead of calling Binance directly (CORS)
+    const proxyResp = await fetch(`${DATA_API}/api/funding`);
+    if (!proxyResp.ok) throw new Error("funding proxy failed");
+    const fundingJson = await proxyResp.json();
+    const data = (fundingJson.rates || []).filter(r => r.exchange === "Binance");
 
     if(!data.length) {
-      document.getElementById("funding-table-body").innerHTML = `<tr><td colspan="5" style="padding:16px 12px;font-family:${MN2};font-size:11px;color:#52525b">Funding rate API unavailable from this network. Connect via browser to load live data.</td></tr>`;
+      document.getElementById("funding-table-body").innerHTML = `<tr><td colspan="5" style="padding:16px 12px;font-family:${MN2};font-size:11px;color:#52525b">Funding rate API unavailable. Try refreshing.</td></tr>`;
       return;
     }
+    // Also update KPIs from by_asset
+    const byAsset = fundingJson.by_asset || {};
+    Object.entries(byAsset).forEach(([sym, d]) => {
+      const kpiEl = document.getElementById(`frate-${sym}`);
+      if(kpiEl) {
+        const c = d.avg_ann > 50?"#ef4444":d.avg_ann>20?"#f97316":d.avg_ann>0?"#22c55e":"#818cf8";
+        kpiEl.textContent = `${d.avg_ann.toFixed(1)}%`;
+        kpiEl.style.color = c;
+      }
+    });
 
     // Update KPIs
     data.forEach(d => {
