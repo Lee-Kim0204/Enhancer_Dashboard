@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/defi",    "destination": "/api/defi.js" },
+    { "source": "/api/funding", "destination": "/api/funding.js" }
+  ]
+}
