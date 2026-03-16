@@ -1289,8 +1289,17 @@ const MN2 = "IBM Plex Mono,ui-monospace,Menlo,Consolas,monospace";
 const SANS2 = "'IBM Plex Sans',system-ui,sans-serif";
 
 // Protocols & chains we care about (same as benchmark)
-const TARGET_PROTOCOLS = new Set(["aave-v3","morpho","compound-v3","spark","fluid","euler-v2","kamino","sky"]);
-const TARGET_CHAINS    = new Set(["Ethereum","Base","Arbitrum","Solana","Mantle"]);
+const TARGET_PROTOCOLS = new Set([
+  "aave-v3","aave-v2",
+  "morpho","morpho-blue","morpho-v1","morpho-aave","morpho-compound",
+  "compound-v3","compound-v2","compound-finance",
+  "spark","sparklend","spark-lend",
+  "fluid","fluid-lending","fluid-protocol",
+  "euler-v2","euler",
+  "kamino","kamino-lending","kamino-finance",
+  "sky","sky-money","makerdao","sky-protocol",
+]);
+const TARGET_CHAINS    = new Set(["Ethereum","Base","Arbitrum","Solana","Mantle","Optimism","Polygon"]);
 const TARGET_STABLES   = new Set(["USDC","USDT","USDS","USDe","PYUSD","RLUSD","DAI"]);
 const PROTOCOL_LABELS  = {
   "aave-v3":"Aave V3","morpho":"Morpho","compound-v3":"Compound V3",
@@ -1637,7 +1646,7 @@ function renderDefiRatesTable() {
     if(f.chain !== "All" && p.chain !== f.chain) return false;
     if(f.stablecoin !== "All" && p.symbol !== f.stablecoin) return false;
     if(f.protocol !== "All") {
-      const proto = PROTOCOL_LABELS[p.project]||p.project;
+      const proto = p.projectLabel || PROTOCOL_LABELS[p.project] || p.project;
       if(proto !== f.protocol) return false;
     }
     return true;
@@ -1654,7 +1663,7 @@ function renderDefiRatesTable() {
         ${["Protocol","Chain","Asset","Supply APY ↓","Borrow APY","TVL","Total Borrowing","Utilization"].map(h=>`<th style="font-family:${MN2};font-size:9px;color:#3f3f46;letter-spacing:.1em;text-transform:uppercase;padding:10px 12px;text-align:left;font-weight:400;border-bottom:1px solid rgba(255,255,255,.06);white-space:nowrap">${h}</th>`).join("")}
       </tr></thead>
       <tbody>${filtered.map(p=>`<tr style="border-bottom:1px solid rgba(255,255,255,.04)" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background=''">
-        <td style="padding:9px 12px">${protocolBadge(p.project)}</td>
+        <td style="padding:9px 12px">${protocolBadge(p.projectLabel||p.project)}</td>
         <td style="padding:9px 12px">${chainBadge(p.chain)}</td>
         <td style="padding:9px 12px;font-family:${MN2};font-size:11px;color:#e4e4e7;font-weight:500">${p.symbol}</td>
         <td style="padding:9px 12px;font-family:${MN2};font-size:12px;color:${apyColor(p.apyBase||0)};font-weight:500">${apyStr(p.apyBase)}</td>
@@ -1696,7 +1705,7 @@ function renderDefiSupplyTable() {
 
   const chains = ["All",...[...TARGET_CHAINS]];
   const stables = ["All",...TARGET_STABLES];
-  const protocols = ["All",...Object.values(PROTOCOL_LABELS)];
+  const protocols = ["All",...new Set(Object.values(PROTOCOL_LABELS))];
 
   el.innerHTML = `<div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:14px">
     <div style="display:flex;padding:0 14px;border-bottom:1px solid rgba(255,255,255,.06)">
@@ -1721,7 +1730,7 @@ function renderDefiSupplyTable() {
     if(f.chain !== "All" && p.chain !== f.chain) return false;
     if(f.stablecoin !== "All" && p.symbol !== f.stablecoin) return false;
     if(f.protocol !== "All") {
-      const proto = PROTOCOL_LABELS[p.project]||p.project;
+      const proto = p.projectLabel || PROTOCOL_LABELS[p.project] || p.project;
       if(proto !== f.protocol) return false;
     }
     return true;
@@ -1780,7 +1789,7 @@ function renderDefiBorrowTable() {
 
   const chains = ["All",...[...TARGET_CHAINS]];
   const stables = ["All",...TARGET_STABLES];
-  const protocols = ["All",...Object.values(PROTOCOL_LABELS)];
+  const protocols = ["All",...new Set(Object.values(PROTOCOL_LABELS))];
 
   el.innerHTML = `<div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:14px">
     <div style="display:flex;padding:0 14px;border-bottom:1px solid rgba(255,255,255,.06)">
@@ -1797,21 +1806,30 @@ function renderDefiBorrowTable() {
     </div>
   </div>`;
 
-  // Borrow pools: need apyBaseBorrow > 0
+  // Borrow pools: totalBorrowUsd > 0 이거나 apyBaseBorrow 있으면 표시
   let filtered = _defiPoolsData.filter(p => {
     if(!TARGET_PROTOCOLS.has(p.project)) return false;
     if(!TARGET_STABLES.has(p.symbol)) return false;
     if(!TARGET_CHAINS.has(p.chain)) return false;
-    if(!(p.apyBaseBorrow > 0)) return false;
-    if((p.totalBorrowUsd||0) < 100_000) return false;
+    // borrow rate OR borrow amount 있으면 포함
+    // totalBorrowUsd OR apyBaseBorrow 하나라도 있으면 표시
+    const hasBorrow = (p.totalBorrowUsd||0) > 500_000 || (p.apyBaseBorrow||0) > 0;
+    if(!hasBorrow) return false;
     if(f.chain !== "All" && p.chain !== f.chain) return false;
     if(f.stablecoin !== "All" && p.symbol !== f.stablecoin) return false;
     if(f.protocol !== "All") {
-      const proto = PROTOCOL_LABELS[p.project]||p.project;
+      const proto = p.projectLabel || PROTOCOL_LABELS[p.project] || p.project;
       if(proto !== f.protocol) return false;
     }
     return true;
-  }).sort((a,b) => (a.apyBaseBorrow||0) - (b.apyBaseBorrow||0));
+  }).sort((a,b) => {
+    // borrow rate 있으면 낮은 순, 없으면 TVL 높은 순
+    if((a.apyBaseBorrow||0) > 0 && (b.apyBaseBorrow||0) > 0)
+      return (a.apyBaseBorrow||0) - (b.apyBaseBorrow||0);
+    if((a.apyBaseBorrow||0) > 0) return -1;
+    if((b.apyBaseBorrow||0) > 0) return 1;
+    return (b.totalBorrowUsd||0) - (a.totalBorrowUsd||0);
+  });
 
   tel.innerHTML = `<div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
     <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)">
