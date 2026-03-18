@@ -46,17 +46,32 @@ export default async function handler(req, res) {
   }
 }
 
+async function fetchWithTimeout(url, options = {}, timeoutMs = 6000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const r = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(timer);
+    return r;
+  } catch (e) {
+    clearTimeout(timer);
+    throw e;
+  }
+}
+
 async function fetchBinance() {
   const results = await Promise.allSettled(
     BINANCE_SYMBOLS.map(s =>
-      fetch(`https://fapi.binance.com/fapi/v1/premiumIndex?symbol=${s}`, {
-        headers: { "User-Agent": "EnhancerDashboard/1.0" }
-      }).then(r => r.json())
+      fetchWithTimeout(
+        `https://fapi.binance.com/fapi/v1/premiumIndex?symbol=${s}`,
+        { headers: { "User-Agent": "EnhancerDashboard/1.0" } },
+        6000
+      ).then(r => r.json())
     )
   );
 
   return results
-    .filter(r => r.status === "fulfilled" && !r.value.code)
+    .filter(r => r.status === "fulfilled" && r.value && !r.value.code)
     .map(r => {
       const d = r.value;
       const rate = parseFloat(d.lastFundingRate || 0);
@@ -74,14 +89,16 @@ async function fetchBinance() {
 async function fetchBybit() {
   const results = await Promise.allSettled(
     BYBIT_SYMBOLS.map(s =>
-      fetch(`https://api.bybit.com/v5/market/tickers?category=linear&symbol=${s}`, {
-        headers: { "User-Agent": "EnhancerDashboard/1.0" }
-      }).then(r => r.json())
+      fetchWithTimeout(
+        `https://api.bybit.com/v5/market/tickers?category=linear&symbol=${s}`,
+        { headers: { "User-Agent": "EnhancerDashboard/1.0" } },
+        6000
+      ).then(r => r.json())
     )
   );
 
   return results
-    .filter(r => r.status === "fulfilled")
+    .filter(r => r.status === "fulfilled" && r.value?.result)
     .flatMap(r => {
       const items = r.value?.result?.list || [];
       return items.map(d => {

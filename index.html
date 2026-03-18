@@ -2030,8 +2030,9 @@ async function loadBinanceFundingRates() {
       tbody.innerHTML = rows + `<tr><td colspan="5" style="padding:8px 12px;font-family:${MN2};font-size:9px;color:#3f3f46">Source: Binance FAPI · ${new Date().toLocaleTimeString("ko-KR")} KST</td></tr>`;
     }
   } catch(e) {
+    console.warn("[Enhancer] loadBinanceFundingRates error:", e.message);
     const tbody = document.getElementById("funding-table-body");
-    if(tbody) tbody.innerHTML = `<tr><td colspan="5" style="padding:16px 12px;font-family:${MN2};font-size:11px;color:#52525b">Live data unavailable (CORS/network). Use backend proxy for production.</td></tr>`;
+    if(tbody) tbody.innerHTML = `<tr><td colspan="5" style="padding:16px 12px;font-family:${MN2};font-size:11px;color:#52525b">Funding rate API error: ${e.message} — try ↺ Refresh.</td></tr>`;
   }
 }
 
