@@ -1391,9 +1391,9 @@ async function fetchPools() {
 
 async function fetchFundingData() {
   try {
-    const r = await fetch(`${DATA_API}/api/funding`, {signal: AbortSignal.timeout(3000)});
+    const r = await fetch(`${DATA_API}/api/funding`, {signal: AbortSignal.timeout(15000)});
     if(r.ok) return await r.json();
-  } catch(e) { /* fall through */ }
+  } catch(e) { console.warn("[Enhancer] fetchFundingData failed:", e.message); }
   return null;
 }
 
@@ -1998,7 +1998,7 @@ async function loadBinanceFundingRates() {
       document.getElementById("funding-table-body").innerHTML = `<tr><td colspan="5" style="padding:16px 12px;font-family:${MN2};font-size:11px;color:#52525b">Funding rate API unavailable. Try refreshing.</td></tr>`;
       return;
     }
-    // Also update KPIs from by_asset
+    // Update KPIs from by_asset (avg across exchanges)
     const byAsset = fundingJson.by_asset || {};
     Object.entries(byAsset).forEach(([sym, d]) => {
       const kpiEl = document.getElementById(`frate-${sym}`);
@@ -2009,29 +2009,16 @@ async function loadBinanceFundingRates() {
       }
     });
 
-    // Update KPIs
-    data.forEach(d => {
-      const sym = d.symbol?.replace("USDT","");
-      const rateAnn = parseFloat(d.lastFundingRate||0) * 3 * 365 * 100;
-      const el = document.getElementById(`frate-${sym}`);
-      if(el) {
-        const color = rateAnn > 50 ? "#ef4444" : rateAnn > 20 ? "#f97316" : rateAnn > 0 ? "#22c55e" : "#818cf8";
-        el.textContent = `${rateAnn.toFixed(1)}%`;
-        el.style.color = color;
-      }
-    });
-
-    // Update table
-    const now = Date.now();
+    // Update table — use pre-processed fields from /api/funding response
     const rows = data.map(d => {
-      const sym = d.symbol?.replace("USDT","");
-      const rate8h = parseFloat(d.lastFundingRate||0) * 100;
-      const rateAnn = rate8h * 3 * 365;
-      const nextTime = d.nextFundingTime ? new Date(d.nextFundingTime).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"}) : "—";
+      const exchColor = d.exchange==="Binance"?"#f59e0b":d.exchange==="Bybit"?"#f97316":"#818cf8";
+      const rate8h  = d.funding_rate_8h ?? 0;   // already in % (e.g. 0.0100 = 0.01%)
+      const rateAnn = d.funding_ann ?? 0;         // already annualized %
+      const nextTime = d.next_funding_ts ? new Date(d.next_funding_ts).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"}) : "—";
       const rateColor = rateAnn > 50 ? "#ef4444" : rateAnn > 20 ? "#f97316" : rateAnn > 0 ? "#22c55e" : "#818cf8";
       return `<tr style="border-bottom:1px solid rgba(255,255,255,.04)" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background=''">
-        <td style="padding:9px 12px;font-family:${MN2};font-size:12px;color:#e4e4e7;font-weight:500">${sym}/USDT</td>
-        <td style="padding:9px 12px"><span style="font-family:${MN2};font-size:10px;color:#f59e0b">Binance</span></td>
+        <td style="padding:9px 12px;font-family:${MN2};font-size:12px;color:#e4e4e7;font-weight:500">${d.symbol}/USDT</td>
+        <td style="padding:9px 12px"><span style="font-family:${MN2};font-size:10px;color:${exchColor}">${d.exchange}</span></td>
         <td style="padding:9px 12px;font-family:${MN2};font-size:12px;color:${rateColor};font-weight:500">${rate8h.toFixed(4)}%</td>
         <td style="padding:9px 12px;font-family:${MN2};font-size:12px;color:${rateColor}">${rateAnn.toFixed(1)}%</td>
         <td style="padding:9px 12px;font-family:${MN2};font-size:11px;color:#52525b">${nextTime}</td>
