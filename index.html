@@ -1795,15 +1795,12 @@ function renderDefiBorrowTable() {
     </div>
   </div>`;
 
-  // Borrow pools: totalBorrowUsd > 0 이거나 apyBaseBorrow 있으면 표시
+  // Borrow pools: supply TVL 기준으로 표시 (apyBaseBorrow/totalBorrowUsd가 없는 경우 "—" 표시)
   let filtered = _defiPoolsData.filter(p => {
     if(!TARGET_PROTOCOLS.has(p.project)) return false;
     if(!TARGET_STABLES.has(p.symbol)) return false;
     if(!TARGET_CHAINS.has(p.chain)) return false;
-    // borrow rate OR borrow amount 있으면 포함
-    // totalBorrowUsd OR apyBaseBorrow 하나라도 있으면 표시
-    const hasBorrow = (p.totalBorrowUsd||0) > 500_000 || (p.apyBaseBorrow||0) > 0;
-    if(!hasBorrow) return false;
+    if((p.tvlUsd||0) < 500_000) return false;
     if(f.chain !== "All" && p.chain !== f.chain) return false;
     if(f.stablecoin !== "All" && p.symbol !== f.stablecoin) return false;
     if(f.protocol !== "All") {
@@ -1812,12 +1809,13 @@ function renderDefiBorrowTable() {
     }
     return true;
   }).sort((a,b) => {
-    // borrow rate 있으면 낮은 순, 없으면 TVL 높은 순
-    if((a.apyBaseBorrow||0) > 0 && (b.apyBaseBorrow||0) > 0)
-      return (a.apyBaseBorrow||0) - (b.apyBaseBorrow||0);
-    if((a.apyBaseBorrow||0) > 0) return -1;
-    if((b.apyBaseBorrow||0) > 0) return 1;
-    return (b.totalBorrowUsd||0) - (a.totalBorrowUsd||0);
+    // borrow rate 있는 것 먼저, 그 안에서 낮은 순 / 없으면 TVL 높은 순
+    const aHas = (a.apyBaseBorrow||0) > 0;
+    const bHas = (b.apyBaseBorrow||0) > 0;
+    if(aHas && bHas) return (a.apyBaseBorrow||0) - (b.apyBaseBorrow||0);
+    if(aHas) return -1;
+    if(bHas) return 1;
+    return (b.tvlUsd||0) - (a.tvlUsd||0);
   });
 
   tel.innerHTML = `<div style="border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
