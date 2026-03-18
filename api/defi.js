@@ -8,6 +8,7 @@ const TARGET_PROTOCOLS = new Set([
   "aave-v3", "aave-v2",
   // Morpho (slug 변형 모두 포함)
   "morpho", "morpho-blue", "morpho-v1", "morpho-aave", "morpho-compound",
+  "morpho-v0-aavev2", "morpho-v0-compoundv2",
   // Compound
   "compound-v3", "compound-v2", "compound-finance",
   // Spark / SparkLend (MakerDAO 계열)
@@ -33,6 +34,8 @@ const PROTOCOL_LABELS = {
   "morpho-v1": "Morpho",
   "morpho-aave": "Morpho",
   "morpho-compound": "Morpho",
+  "morpho-v0-aavev2": "Morpho",
+  "morpho-v0-compoundv2": "Morpho",
   "compound-v3": "Compound V3",
   "compound-v2": "Compound V2",
   "compound-finance": "Compound",

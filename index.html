@@ -1292,6 +1292,7 @@ const SANS2 = "'IBM Plex Sans',system-ui,sans-serif";
 const TARGET_PROTOCOLS = new Set([
   "aave-v3","aave-v2",
   "morpho","morpho-blue","morpho-v1","morpho-aave","morpho-compound",
+  "morpho-v0-aavev2","morpho-v0-compoundv2",
   "compound-v3","compound-v2","compound-finance",
   "spark","sparklend","spark-lend",
   "fluid","fluid-lending","fluid-protocol",
@@ -1304,6 +1305,7 @@ const TARGET_STABLES   = new Set(["USDC","USDT","USDS","USDe","PYUSD","RLUSD","D
 const PROTOCOL_LABELS  = {
   "aave-v3":"Aave V3","aave-v2":"Aave V2",
   "morpho":"Morpho","morpho-blue":"Morpho","morpho-v1":"Morpho","morpho-aave":"Morpho","morpho-compound":"Morpho",
+  "morpho-v0-aavev2":"Morpho","morpho-v0-compoundv2":"Morpho",
   "compound-v3":"Compound V3","compound-v2":"Compound V2","compound-finance":"Compound",
   "spark":"Spark","sparklend":"Spark","spark-lend":"Spark",
   "fluid":"Fluid","fluid-lending":"Fluid","fluid-protocol":"Fluid",
@@ -1362,44 +1364,26 @@ async function fetchPools() {
   }
   _poolsFetching = true;
   try {
-    // Try local scheduler API first
-    let pools = null;
-    try {
-      const r = await fetch(`${DATA_API}/api/defi`, {signal: AbortSignal.timeout(3000)});
-      if(r.ok) {
-        const j = await r.json();
-        // /api/defi returns { pools: [...], benchmark: {...} }
-        pools = j.pools || j.data || null;
-        if(pools) {
-          // Also fetch manifest for status bar
-          fetchManifest();
-          console.info(`[Enhancer] Loaded ${pools.length} pools from local API (${j.updated_at})`);
-        }
-      }
-    } catch(e) { /* local server not running, fall through */ }
+    const r = await fetch(`${DATA_API}/api/defi`, {signal: AbortSignal.timeout(15000)});
+    if(!r.ok) throw new Error(`API error: ${r.status}`);
+    const j = await r.json();
 
-    // Fallback: call DeFiLlama directly
-    if(!pools) {
-      console.info("[Enhancer] Local API unavailable, fetching from DeFiLlama...");
-      const r = await fetch(`${DATA_API}/api/defi`);
-      const j = await r.json();
-      const raw = j.pools || j.data || [];
-      // Apply same filter as collector
-      pools = raw.filter(p =>
-        TARGET_PROTOCOLS.has(p.project) &&
-        TARGET_SYMBOLS.has(p.symbol) &&
-        TARGET_CHAINS.has(p.chain) &&
-        (p.tvlUsd||0) >= 500_000
-      );
-      console.info(`[Enhancer] Loaded ${pools.length} pools from DeFiLlama directly`);
+    // Debug: log available slugs from DeFiLlama to help diagnose missing protocols
+    if(j.debug_all_slugs) {
+      console.info(`[Enhancer] Available DeFiLlama slugs (stables+target chains):`, j.debug_all_slugs);
     }
 
+    const pools = j.pools || j.data || [];
+    console.info(`[Enhancer] Loaded ${pools.length} pools (updated: ${j.updated_at})`);
+
+    fetchManifest();
     _poolsCache = pools;
     _poolsCallbacks.forEach(cb => cb(_poolsCache));
     _poolsCallbacks = [];
+    _poolsFetching = false;
     return _poolsCache;
   } catch(e) {
-    console.warn("Data fetch failed:", e);
+    console.warn("[Enhancer] Data fetch failed:", e.message);
     _poolsFetching = false;
     return [];
   }
