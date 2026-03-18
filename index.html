@@ -1296,15 +1296,20 @@ const TARGET_PROTOCOLS = new Set([
   "spark","sparklend","spark-lend",
   "fluid","fluid-lending","fluid-protocol",
   "euler-v2","euler",
-  "kamino","kamino-lending","kamino-finance",
-  "sky","sky-money","makerdao","sky-protocol",
+  "kamino-lend","kamino","kamino-lending","kamino-finance",
+  "sky-lending","sky","sky-money","makerdao","sky-protocol",
 ]);
 const TARGET_CHAINS    = new Set(["Ethereum","Base","Arbitrum","Solana","Mantle","Optimism","Polygon"]);
 const TARGET_STABLES   = new Set(["USDC","USDT","USDS","USDe","PYUSD","RLUSD","DAI"]);
 const PROTOCOL_LABELS  = {
-  "aave-v3":"Aave V3","morpho":"Morpho","compound-v3":"Compound V3",
-  "spark":"Spark","fluid":"Fluid","euler-v2":"Euler V2",
-  "kamino":"Kamino","sky":"Sky","compound-finance":"Compound"
+  "aave-v3":"Aave V3","aave-v2":"Aave V2",
+  "morpho":"Morpho","morpho-blue":"Morpho","morpho-v1":"Morpho","morpho-aave":"Morpho","morpho-compound":"Morpho",
+  "compound-v3":"Compound V3","compound-v2":"Compound V2","compound-finance":"Compound",
+  "spark":"Spark","sparklend":"Spark","spark-lend":"Spark",
+  "fluid":"Fluid","fluid-lending":"Fluid","fluid-protocol":"Fluid",
+  "euler-v2":"Euler V2","euler":"Euler",
+  "kamino-lend":"Kamino","kamino":"Kamino","kamino-lending":"Kamino","kamino-finance":"Kamino",
+  "sky-lending":"Sky","sky":"Sky","sky-money":"Sky","makerdao":"Sky","sky-protocol":"Sky"
 };
 
 // ── Data API config ──────────────────────────────────

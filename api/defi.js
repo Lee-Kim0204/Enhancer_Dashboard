@@ -16,10 +16,10 @@ const TARGET_PROTOCOLS = new Set([
   "fluid", "fluid-lending", "fluid-protocol",
   // Euler
   "euler-v2", "euler", "euler-v1",
-  // Kamino (Solana)
-  "kamino", "kamino-lending", "kamino-finance",
-  // Sky / Maker
-  "sky", "sky-money", "makerdao", "sky-protocol",
+  // Kamino (Solana) — DeFiLlama 실제 slug: kamino-lend
+  "kamino-lend", "kamino", "kamino-lending", "kamino-finance",
+  // Sky / Maker — DeFiLlama 실제 slug: sky-lending
+  "sky-lending", "sky", "sky-money", "makerdao", "sky-protocol",
   // 기타
   "venus", "benqi", "radiant-v2",
 ]);
@@ -44,9 +44,11 @@ const PROTOCOL_LABELS = {
   "fluid-protocol": "Fluid",
   "euler-v2": "Euler V2",
   "euler": "Euler",
+  "kamino-lend": "Kamino",
   "kamino": "Kamino",
   "kamino-lending": "Kamino",
   "kamino-finance": "Kamino",
+  "sky-lending": "Sky",
   "sky": "Sky",
   "sky-money": "Sky",
   "makerdao": "Sky",
